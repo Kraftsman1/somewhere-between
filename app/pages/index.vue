@@ -27,10 +27,27 @@
           </template>
         </HiddenNote>
 
-        <div class="mt-8 pt-8 border-t border-accent/10 opacity-0 animate-fade-in" style="animation-delay: 3s;">
-          <NuxtLink to="/valentine"
-            class="text-xs tracking-[0.3em] uppercase text-accent hover:text-accent-warm transition-colors duration-700 no-underline">
-            A dedicated moment
+        <div ref="dedicatedMomentRef" class="mt-16 opacity-0 translate-y-4 transition-all duration-1000">
+          <NuxtLink to="/valentine" class="group relative inline-flex flex-col items-center no-underline"
+            @mouseenter="handleCTAInteraction(true)" @mouseleave="handleCTAInteraction(false)">
+            <!-- Decorative Background Glow -->
+            <div
+              class="absolute -inset-4 bg-accent/5 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000">
+            </div>
+
+            <div
+              class="relative px-8 py-4 border border-accent/20 rounded-full bg-white/5 backdrop-blur-sm group-hover:border-accent/40 transition-all duration-700">
+              <span class="text-xs md:text-sm tracking-[0.4em] uppercase text-accent font-sans">
+                A dedicated moment
+              </span>
+            </div>
+
+            <!-- Intent indicator -->
+            <div
+              class="mt-4 flex flex-col items-center space-y-2 opacity-40 group-hover:opacity-80 transition-opacity duration-1000">
+              <div class="w-[1px] h-8 bg-accent/30"></div>
+              <span class="text-[9px] tracking-[0.2em] uppercase italic">For you</span>
+            </div>
           </NuxtLink>
         </div>
 
@@ -56,6 +73,7 @@ const isGlowing = ref(false)
 const warmthLevel = ref(0)
 const depthLevel = ref(0)
 const lastActivity = ref(Date.now())
+const dedicatedMomentRef = ref<HTMLElement | null>(null)
 const showLoopClosure = ref(false)
 const activeMonth = ref<string | null>(null)
 
@@ -79,6 +97,12 @@ const months = ref<{
   { name: 'November', message: 'The world drew close again. Coziness as a necessity.' },
   { name: 'December', message: 'Looking back, I realized how much peace you brought.', extraText: 'Some days don’t need much noise to feel meaningful.', extraDelay: 4000 },
 ])
+
+const handleCTAInteraction = (active: boolean) => {
+  if (active && typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+    navigator.vibrate(10)
+  }
+}
 
 const handleMonthEnter = (name: string) => {
   activeMonth.value = name
@@ -106,7 +130,7 @@ const handleMonthEnter = (name: string) => {
 const handleMonthLeave = (name: string) => {
   if (activeMonth.value === name) {
     activeMonth.value = null
-    // Reset to defaults on leave to ensure no "glow" hangs after March
+    // Reset to defaults on leave to ensure no "glow" hangs
     isGlowing.value = false
     warmthLevel.value = 0
     depthLevel.value = 0
@@ -117,6 +141,18 @@ const handleFinalEnter = () => {
   activeMonth.value = 'final'
   isGlowing.value = true
   warmthLevel.value = 0.25
+
+  // Reveal Dedicated Moment CTA
+  if (dedicatedMomentRef.value) {
+    gsap.to(dedicatedMomentRef.value, {
+      opacity: 1,
+      y: 0,
+      duration: 2,
+      delay: 1.5,
+      ease: 'expo.out'
+    })
+  }
+
   setTimeout(() => { showLoopClosure.value = true }, 5000)
 }
 
