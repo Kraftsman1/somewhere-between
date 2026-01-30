@@ -5,7 +5,7 @@
     <ProgressIndicator />
 
     <!-- Landing Section -->
-    <SectionWrapper>
+    <SectionWrapper @enter="handleMonthEnter('landing')" @leave="handleMonthLeave('landing')">
       <h1 class="font-serif text-5xl md:text-7xl italic mb-6">A Year in <br /> Calm Moments</h1>
       <p class="font-sans text-sm tracking-widest uppercase opacity-60">Scroll gently</p>
     </SectionWrapper>
@@ -13,10 +13,10 @@
     <!-- Months Journey -->
     <MonthSection v-for="(month, index) in months" :key="month.name" v-bind="month"
       :id="`month-${month.name.toLowerCase()}`" :class="{ 'text-accent-warm': month.name === 'October' }"
-      @enter="handleMonthEnter(month)" />
+      @enter="handleMonthEnter(month.name)" @leave="handleMonthLeave(month.name)" />
 
     <!-- Final Section -->
-    <SectionWrapper @enter="handleFinalEnter">
+    <SectionWrapper @enter="handleFinalEnter" @leave="handleMonthLeave('final')">
       <div class="space-y-12">
         <p class="font-serif text-2xl md:text-3xl italic">
           Thank you for being the calmest part of my year.
@@ -57,8 +57,15 @@ const warmthLevel = ref(0)
 const depthLevel = ref(0)
 const lastActivity = ref(Date.now())
 const showLoopClosure = ref(false)
+const activeMonth = ref<string | null>(null)
 
-const months = ref([
+const months = ref<{
+  name: string;
+  message: string;
+  interactionType?: 'resistance' | 'focus' | 'exhale' | 'pacing' | 'static';
+  extraText?: string;
+  extraDelay?: number;
+}[]>([
   { name: 'January', message: 'The year began with a quiet promise.', interactionType: 'resistance' },
   { name: 'February', message: 'Short days, long thoughts, and the comfort of returning.', extraText: 'Today felt like a good day to say this.', extraDelay: 7000 },
   { name: 'March', message: 'Slowly, light started to reclaim the afternoons.', interactionType: 'exhale' },
@@ -73,25 +80,53 @@ const months = ref([
   { name: 'December', message: 'Looking back, I realized how much peace you brought.', extraText: 'Some days don’t need much noise to feel meaningful.', extraDelay: 4000 },
 ])
 
-const handleMonthEnter = (month: any) => {
-  isGlowing.value = month.name === 'May'
-  warmthLevel.value = (month.name === 'May' || month.name === 'October') ? 0.4 : 0
-  depthLevel.value = month.name === 'November' ? 0.8 : 0
+const handleMonthEnter = (name: string) => {
+  activeMonth.value = name
 
-  if (month.name !== 'February') {
-    isStill.value = false
+  // Explicitly reset on enter to clear any previous state "stuck"
+  isGlowing.value = false
+  warmthLevel.value = 0
+  depthLevel.value = 0
+
+  if (name === 'May') {
+    isGlowing.value = true
+    warmthLevel.value = 0.4
+  } else if (name === 'October') {
+    warmthLevel.value = 0.5
+  } else if (name === 'February') {
+    warmthLevel.value = 0.15
+  } else if (name === 'November') {
+    depthLevel.value = 0.8
+  }
+
+  // Re-sync stillness
+  resetActivity()
+}
+
+const handleMonthLeave = (name: string) => {
+  if (activeMonth.value === name) {
+    activeMonth.value = null
+    // Reset to defaults on leave to ensure no "glow" hangs after March
+    isGlowing.value = false
+    warmthLevel.value = 0
+    depthLevel.value = 0
   }
 }
 
 const handleFinalEnter = () => {
+  activeMonth.value = 'final'
   isGlowing.value = true
-  warmthLevel.value = 0.2
+  warmthLevel.value = 0.25
   setTimeout(() => { showLoopClosure.value = true }, 5000)
 }
 
 const checkStillness = () => {
-  if (Date.now() - lastActivity.value > 7000) {
-    isStill.value = true
+  const now = Date.now()
+  // Trigger stillness if idle for 7s AND on February (or February-like states)
+  if (now - lastActivity.value > 7000) {
+    if (activeMonth.value === 'February' || activeMonth.value === 'final') {
+      isStill.value = true
+    }
   }
 }
 
@@ -103,9 +138,9 @@ const resetActivity = () => {
 let ticker: any = null
 
 onMounted(() => {
-  window.addEventListener('scroll', resetActivity)
+  window.addEventListener('scroll', resetActivity, { passive: true })
   window.addEventListener('mousemove', resetActivity)
-  window.addEventListener('touchstart', resetActivity)
+  window.addEventListener('touchstart', resetActivity, { passive: true })
   ticker = setInterval(checkStillness, 1000)
 
   // September Scroll-Back Logic

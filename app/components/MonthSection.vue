@@ -1,30 +1,27 @@
 <template>
-  <SectionWrapper :scroll-resistance="interactionType === 'resistance'" @enter="handleEnter">
-    <div class="space-y-6 transition-all duration-1000 ease-in-out" :style="interactionStyles"
-      @mouseenter="handleTouch(true)" @mouseleave="handleTouch(false)" @touchstart="handleTouch(true)"
-      @touchend="handleTouch(false)">
-      <h2 v-if="month" class="text-xs md:text-sm uppercase tracking-[0.2em] font-sans text-accent opacity-80">{{ month
-        }}</h2>
+  <SectionWrapper :scroll-resistance="interactionType === 'resistance'" @enter="handleEnter" @leave="handleLeave">
+    <div ref="container" class="space-y-6" @mouseenter="handleInteraction(true)" @mouseleave="handleInteraction(false)"
+      @touchstart="handleInteraction(true)" @touchend="handleInteraction(false)">
+      <h2 v-if="month" class="text-xs md:text-sm uppercase tracking-[0.2em] font-sans text-accent opacity-80">
+        {{ month }}
+      </h2>
 
       <div ref="textContainer" class="space-y-4">
-        <p v-if="!isLineByLine"
-          class="text-2xl md:text-4xl font-serif leading-relaxed text-text transition-all duration-[2000ms]"
-          :class="{ 'blur-sm opacity-50': interactionType === 'focus' && !isFocused }">
+        <p v-if="!isLineByLine" ref="messageEl"
+          class="text-2xl md:text-4xl font-serif leading-relaxed text-text opacity-100">
           {{ message }}
         </p>
 
         <div v-else class="space-y-4">
           <p v-for="(line, i) in lines" :key="i"
-            class="text-2xl md:text-4xl font-serif leading-relaxed text-text opacity-0 transform translate-y-4 transition-all duration-1000"
-            :style="{ transitionDelay: `${i * 2000}ms`, opacity: visibleLines > i ? 1 : 0, transform: visibleLines > i ? 'translateY(0)' : 'translateY(1rem)' }">
+            class="line-item text-2xl md:text-4xl font-serif leading-relaxed text-text opacity-0 transform translate-y-4">
             {{ line }}
           </p>
         </div>
       </div>
 
-      <div v-if="extraText" class="mt-8 transition-opacity duration-[2000ms]"
-        :class="extraVisible ? 'opacity-60' : 'opacity-0'">
-        <p class="text-sm font-sans tracking-wide italic">{{ extraText }}</p>
+      <div ref="extraEl" v-if="extraText" class="mt-8 opacity-0">
+        <p class="text-sm font-sans tracking-wide italic text-accent/60">{{ extraText }}</p>
       </div>
 
       <slot name="extra" />
@@ -33,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import { animate } from 'animejs'
+import { gsap } from 'gsap'
 import SectionWrapper from '~/components/SectionWrapper.vue'
 
 const props = defineProps<{
@@ -44,50 +41,91 @@ const props = defineProps<{
   extraDelay?: number
 }>()
 
-const textContainer = ref(null)
+const emits = defineEmits(['enter', 'leave'])
+
+const container = ref<HTMLElement | null>(null)
+const textContainer = ref<HTMLElement | null>(null)
+const messageEl = ref<HTMLElement | null>(null)
+const extraEl = ref<HTMLElement | null>(null)
+
 const isFocused = ref(false)
-const extraVisible = ref(false)
-const visibleLines = ref(0)
-const isExhaling = ref(false)
+const timeline = ref<gsap.core.Timeline | null>(null)
 
 const isLineByLine = computed(() => props.interactionType === 'pacing')
 const lines = computed(() => props.message.split('\n'))
 
-const interactionStyles = computed(() => {
-  if (props.interactionType === 'exhale' && isExhaling.value) {
-    return {
-      letterSpacing: '0.05em',
-      lineHeight: '1.8'
-    }
-  }
-  return {}
-})
-
 const handleEnter = () => {
-  if (props.interactionType === 'focus') {
-    setTimeout(() => { isFocused.value = true }, 500)
-  }
+  emits('enter')
 
-  if (props.interactionType === 'pacing') {
-    visibleLines.value = 0
-    lines.value.forEach((_, i) => {
-      setTimeout(() => { visibleLines.value = i + 1 }, i * 2000)
+  // Clear any existing timeline
+  timeline.value?.kill()
+  timeline.value = gsap.timeline()
+
+  if (props.interactionType === 'focus' && messageEl.value) {
+    // Reveal by fade instead of blur
+    gsap.set(messageEl.value, { opacity: 0.4 })
+    timeline.value.to(messageEl.value, {
+      opacity: 1,
+      duration: 1.5,
+      delay: 0.2,
+      ease: 'power2.out',
+      onComplete: () => { isFocused.value = true }
     })
   }
 
-  if (props.extraText && props.extraDelay) {
-    setTimeout(() => { extraVisible.value = true }, props.extraDelay)
+  if (isLineByLine.value && container.value) {
+    timeline.value.to(container.value.querySelectorAll('.line-item'), {
+      opacity: 1,
+      y: 0,
+      duration: 1.5,
+      stagger: 2,
+      ease: 'power2.out'
+    }, 0.5)
   }
 
-  // Haptic feedback for August (if designated by props later)
-  if (props.month === 'August' && 'vibrate' in navigator) {
-    navigator.vibrate(50)
+  if (props.extraText && props.extraDelay) {
+    timeline.value.to(extraEl.value, {
+      opacity: 1,
+      duration: 2,
+      delay: props.extraDelay / 1000,
+      ease: 'sine.inOut'
+    }, 0)
+  }
+
+  // August haptics
+  if (props.month === 'August' && typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+    navigator.vibrate([20, 40, 20])
   }
 }
 
-const handleTouch = (active: boolean) => {
-  if (props.interactionType === 'exhale') {
-    isExhaling.value = active
+const handleLeave = () => {
+  emits('leave')
+  isFocused.value = false
+  timeline.value?.kill()
+
+  // Hard reset all animated states on leave
+  if (extraEl.value) gsap.set(extraEl.value, { opacity: 0 })
+  if (messageEl.value) {
+    gsap.set(messageEl.value, { opacity: 1, letterSpacing: '0em', lineHeight: 1.6 })
+  }
+  if (isLineByLine.value && container.value) {
+    gsap.set(container.value.querySelectorAll('.line-item'), { opacity: 0, y: 16 })
+  }
+}
+
+const handleInteraction = (active: boolean) => {
+  if (props.interactionType === 'exhale' && messageEl.value) {
+    gsap.to(messageEl.value, {
+      letterSpacing: active ? '0.04em' : '0em',
+      lineHeight: active ? 1.75 : 1.6,
+      duration: 1.0,
+      ease: active ? 'power2.out' : 'power2.inOut' // Removed elastic for better clarity
+    })
+  }
+
+  // Heartbeat haptics for October
+  if (active && props.month === 'October' && typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+    navigator.vibrate([40, 60, 40])
   }
 }
 </script>

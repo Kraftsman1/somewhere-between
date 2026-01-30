@@ -19,8 +19,8 @@ const props = defineProps<{
 
 const emits = defineEmits(['enter', 'leave'])
 
-const sectionRef = ref(null)
-const contentRef = ref(null)
+const sectionRef = ref<HTMLElement | null>(null)
+const contentRef = ref<HTMLElement | null>(null)
 
 onMounted(() => {
   const el = sectionRef.value
@@ -29,23 +29,26 @@ onMounted(() => {
   // Enter animation
   ScrollTrigger.create({
     trigger: el,
-    start: 'top 50%',
+    start: 'top 45%', // Slightly earlier for better flow
+    end: 'bottom 55%',
     onEnter: () => {
       emits('enter')
       gsap.to(content, {
         opacity: 1,
         y: 0,
-        duration: props.scrollResistance ? 2.5 : 1.5,
-        delay: props.scrollResistance ? 0.5 : 0,
-        ease: 'power2.out'
+        scale: 1,
+        duration: props.scrollResistance ? 1.5 : 1.2,
+        delay: props.scrollResistance ? 0.2 : 0,
+        ease: 'expo.out'
       })
     },
     onLeave: () => {
       emits('leave')
       gsap.to(content, {
         opacity: 0,
-        y: -30,
-        duration: 1,
+        y: -40,
+        scale: 0.99,
+        duration: 0.8,
         ease: 'power2.in'
       })
     },
@@ -54,16 +57,18 @@ onMounted(() => {
       gsap.to(content, {
         opacity: 1,
         y: 0,
-        duration: 1.5,
-        ease: 'power2.out'
+        scale: 1,
+        duration: 1.2,
+        ease: 'expo.out'
       })
     },
     onLeaveBack: () => {
       emits('leave')
       gsap.to(content, {
         opacity: 0,
-        y: 30,
-        duration: 1,
+        y: 40,
+        scale: 0.99,
+        duration: 0.8,
         ease: 'power2.in'
       })
     }

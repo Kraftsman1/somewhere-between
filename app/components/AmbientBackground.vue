@@ -4,19 +4,17 @@
     :style="{ backgroundColor: warmthColor }">
     <!-- Animated background elements (orbs) -->
     <div ref="dot1"
-      class="absolute top-1/4 left-1/4 w-64 md:w-96 h-64 md:h-96 rounded-full bg-accent/20 blur-3xl opacity-60 transition-all duration-[3000ms]"
-      :class="{ 'blur-[120px] scale-125 opacity-40': isGlowing }"></div>
+      class="absolute top-1/4 left-1/4 w-64 md:w-96 h-64 md:h-96 rounded-full bg-accent/15 blur-2xl opacity-50"></div>
     <div ref="dot2"
-      class="absolute bottom-1/3 right-1/4 w-72 md:w-80 h-72 md:h-80 rounded-full bg-accent-warm/15 blur-3xl opacity-60 transition-all duration-[3000ms]"
-      :class="{ 'blur-[100px] scale-110 opacity-30': isGlowing }"></div>
+      class="absolute bottom-1/3 right-1/4 w-72 md:w-80 h-72 md:h-80 rounded-full bg-accent-warm/10 blur-2xl opacity-50">
+    </div>
     <div ref="dot3"
-      class="absolute top-3/4 left-1/2 w-64 md:w-80 h-64 md:h-80 rounded-full bg-accent/10 blur-3xl opacity-50 transition-all duration-[3000ms]"
-      :class="{ 'blur-[80px] scale-105 opacity-20': isGlowing }"></div>
+      class="absolute top-3/4 left-1/2 w-64 md:w-80 h-64 md:h-80 rounded-full bg-accent/10 blur-2xl opacity-40"></div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { animate } from 'animejs'
+import { gsap } from 'gsap'
 
 const props = defineProps<{
   isStill?: boolean
@@ -31,72 +29,53 @@ const dot3 = ref<HTMLElement | null>(null)
 
 // Computed warmth color
 const warmthColor = computed(() => {
-  if (!props.warmthLevel) return '' // Uses CSS default
+  if (!props.warmthLevel) return ''
   const level = props.warmthLevel
-  // Mix neutral bg with a warm tone (fdfaf6 is --color-bg)
-  // We'll use a CSS variable calculation or just return a hex overlay
   return `rgba(253, 250, 246, ${1 - level})`
 })
 
-// Store animation instances
-const anim1 = ref<any>(null)
-const anim2 = ref<any>(null)
-const anim3 = ref<any>(null)
+// Store animation timelines
+const floatTls = ref<gsap.core.Timeline[]>([])
 
 // Watch `isStill` to pause/play
 watch(() => props.isStill, (newVal) => {
-  if (newVal) {
-    anim1.value?.pause()
-    anim2.value?.pause()
-    anim3.value?.pause()
-  } else {
-    anim1.value?.play()
-    anim2.value?.play()
-    anim3.value?.play()
-  }
+  floatTls.value.forEach(tl => newVal ? tl.pause() : tl.play())
 })
 
-// Update speeds based on depthLevel
-watch(() => props.depthLevel, (newVal = 0) => {
-  const speedMult = 1 - (newVal * 0.5) // Slower = more depth
-  // Note: anime.js v4 might not support setting duration on existing instances easily without recreate
-  // For now, we'll keep it simple or recreate if needed.
+// Smooth property updates using GSAP
+watch(() => props.isGlowing, (newVal) => {
+  const dots = [dot1.value, dot2.value, dot3.value]
+  gsap.to(dots, {
+    filter: newVal ? 'blur(60px)' : 'blur(30px)',
+    scale: newVal ? 1.15 : 1,
+    opacity: newVal ? 0.35 : 0.5,
+    duration: 3,
+    stagger: 0.1,
+    ease: 'sine.inOut'
+  })
 })
+
+const initFloating = (el: HTMLElement, xRange: number[], yRange: number[], duration: number) => {
+  const tl = gsap.timeline({ repeat: -1, yoyo: true })
+  tl.to(el, {
+    x: xRange[1],
+    y: yRange[1],
+    duration: duration,
+    ease: 'sine.inOut'
+  })
+  return tl
+}
 
 onMounted(() => {
-  if (dot1.value) {
-    anim1.value = animate(dot1.value, {
-      translateX: [-20, 40],
-      translateY: [-20, 20],
-      scale: [0.9, 1.1],
-      duration: 15000,
-      easing: 'easeInOutSine',
-      direction: 'alternate',
-      loop: true
-    })
-  }
+  if (dot1.value) floatTls.value.push(initFloating(dot1.value, [-40, 40], [-30, 30], 15))
+  if (dot2.value) floatTls.value.push(initFloating(dot2.value, [30, -30], [20, -40], 18))
+  if (dot3.value) floatTls.value.push(initFloating(dot3.value, [-30, 30], [30, -30], 22))
 
-  if (dot2.value) {
-    anim2.value = animate(dot2.value, {
-      translateX: [20, -30],
-      translateY: [10, -50],
-      scale: [1, 1.2],
-      duration: 18000,
-      easing: 'easeInOutSine',
-      direction: 'alternate',
-      loop: true
-    })
-  }
-
-  if (dot3.value) {
-    anim3.value = animate(dot3.value, {
-      translateX: [-30, 30],
-      translateY: [20, -20],
-      duration: 22000,
-      easing: 'easeInOutQuad',
-      direction: 'alternate',
-      loop: true
-    })
-  }
+  // Set initial states
+  gsap.set([dot1.value, dot2.value, dot3.value], {
+    filter: props.isGlowing ? 'blur(60px)' : 'blur(30px)',
+    scale: props.isGlowing ? 1.15 : 1,
+    opacity: props.isGlowing ? 0.35 : 0.5
+  })
 })
 </script>
