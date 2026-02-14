@@ -7,15 +7,12 @@
     <!-- Landing Section -->
     <SectionWrapper @enter="handleMonthEnter('landing')" @leave="handleMonthLeave('landing')">
       <div class="text-center">
-        <p class="font-sans text-[9px] tracking-[0.5em] uppercase text-accent/40 mb-10 font-light">2025 — 2026</p>
-        <h1 class="font-serif text-5xl md:text-7xl leading-[1.1] mb-3">
-          A Year in<br />
-          <em>Calm Moments</em>
+        <p class="font-sans text-[9px] tracking-[0.5em] uppercase text-accent/35 mb-8 font-light">2025 — 2026</p>
+        <h1 class="font-serif text-[2.6rem] md:text-7xl leading-[1.1]">
+          A Year in<br /><em>Calm Moments</em>
         </h1>
-        <div class="flex items-center justify-center gap-4 mt-10">
-          <div class="h-[1px] w-10 bg-accent/20"></div>
-          <p class="font-sans text-[9px] tracking-[0.5em] uppercase text-accent/40 font-light">Scroll gently</p>
-          <div class="h-[1px] w-10 bg-accent/20"></div>
+        <div class="flex items-center gap-3 mt-10 justify-center">
+          <p class="font-sans text-[9px] tracking-[0.45em] uppercase text-accent/40 font-light">Scroll gently</p>
         </div>
       </div>
     </SectionWrapper>
@@ -27,55 +24,42 @@
 
     <!-- Final Section -->
     <SectionWrapper @enter="handleFinalEnter" @leave="handleMonthLeave('final')">
-      <div class="space-y-14">
+      <div class="space-y-10 text-center">
 
-        <div class="space-y-5">
-          <p class="font-serif text-2xl md:text-4xl italic leading-snug">
-            Thank you for being<br />the calmest part of my year.
-          </p>
-          <!-- Thin rule -->
-          <div class="flex justify-center mt-6">
-            <div class="h-[1px] w-12 bg-accent/25"></div>
-          </div>
-        </div>
+        <p class="font-serif text-[1.75rem] md:text-4xl italic leading-snug">
+          Thank you for being<br />the calmest part of my year.
+        </p>
 
         <HiddenNote>
           <template #content>
             Happy Valentine's Day.<br />
-            <span class="text-accent/80">I see you. I appreciate you.</span>
+            <span class="text-accent/75">I see you. I appreciate you.</span>
           </template>
         </HiddenNote>
 
         <!-- CTA: A dedicated moment -->
-        <div ref="dedicatedMomentRef" class="opacity-0 translate-y-4 transition-all duration-1000">
-          <NuxtLink to="/valentine" class="group relative inline-flex flex-col items-center no-underline"
-            @mouseenter="handleCTAInteraction(true)" @mouseleave="handleCTAInteraction(false)">
-
-            <!-- Ambient glow -->
-            <div
-              class="absolute -inset-6 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-[1200ms]"
-              style="background: radial-gradient(circle, rgba(190,152,152,0.12) 0%, transparent 70%);"></div>
+        <div ref="dedicatedMomentRef" class="opacity-0">
+          <NuxtLink
+            to="/valentine"
+            class="group relative inline-flex flex-col items-start no-underline"
+            @mouseenter="handleCTAInteraction(true)"
+            @mouseleave="handleCTAInteraction(false)">
 
             <div
-              class="relative px-10 py-4 bg-transparent group-hover:bg-accent/5 transition-all duration-700"
-              style="border: 1px solid rgba(190,152,152,0.2); border-radius: 2px;">
-              <span class="font-sans text-[10px] tracking-[0.5em] uppercase text-accent/70 group-hover:text-accent transition-colors duration-500 font-light">
-                A dedicated moment
+              class="relative px-8 py-3.5 bg-transparent active:bg-accent/5 group-hover:bg-accent/5 transition-colors duration-500"
+              style="border: 1px solid rgba(190,152,152,0.22); border-radius: 2px;">
+              <span class="font-sans text-[9px] md:text-[10px] tracking-[0.45em] uppercase text-accent/65 group-hover:text-accent/90 active:text-accent transition-colors duration-500 font-light">
+                A dedicated moment for you
               </span>
             </div>
 
-            <!-- Descender arrow -->
-            <div
-              class="mt-5 flex flex-col items-center gap-2 opacity-35 group-hover:opacity-70 transition-opacity duration-700">
-              <div class="w-[1px] h-6 bg-accent/40"></div>
-              <span class="font-sans text-[8px] tracking-[0.3em] uppercase italic text-accent/60">For you</span>
-            </div>
+
           </NuxtLink>
         </div>
 
         <!-- Loop closure -->
         <div v-if="showLoopClosure"
-          class="animate-fade-in font-sans text-[9px] tracking-[0.4em] uppercase text-accent/35 font-light">
+          class="animate-fade-in font-sans text-[9px] tracking-[0.4em] uppercase text-accent/30 font-light">
           Some days don't need much noise to feel meaningful.
         </div>
 
