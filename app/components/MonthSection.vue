@@ -74,6 +74,14 @@ const messageEl = ref<HTMLElement | null>(null)
 const extraEl = ref<HTMLElement | null>(null)
 
 const timeline = ref<gsap.core.Timeline | null>(null)
+let extraTimer: ReturnType<typeof setTimeout> | null = null
+
+const cancelExtra = () => {
+  if (extraTimer !== null) {
+    clearTimeout(extraTimer)
+    extraTimer = null
+  }
+}
 
 const isLineByLine = computed(() => props.interactionType === 'pacing')
 const lines = computed(() => props.message.split('\n'))
@@ -82,6 +90,7 @@ const monthIndex = computed(() => props.month ? monthNames.indexOf(props.month) 
 const handleEnter = () => {
   emits('enter')
   timeline.value?.kill()
+  cancelExtra()
   timeline.value = gsap.timeline()
 
   // 'focus' — wrapper already handles the reveal; no extra opacity manipulation
@@ -100,14 +109,12 @@ const handleEnter = () => {
     }, 0.3)
   }
 
-  // Extra text reveal (delayed)
-  if (props.extraText && props.extraDelay && extraEl.value) {
-    // Cap the delay at 4s on mobile for usability
-    const delay = Math.min(props.extraDelay / 1000, 4)
-    timeline.value.to(extraEl.value, {
-      opacity: 1,
-      duration: 1.5,
-      ease: 'sine.inOut'
+  // Extra text reveal (delayed via setTimeout — more reliable than GSAP position param)
+  if (props.extraText && extraEl.value) {
+    const delay = props.extraDelay ? Math.min(props.extraDelay, 4000) : 0
+    const target = extraEl.value
+    extraTimer = setTimeout(() => {
+      gsap.to(target, { opacity: 1, duration: 1.5, ease: 'sine.inOut' })
     }, delay)
   }
 
@@ -120,6 +127,7 @@ const handleEnter = () => {
 const handleLeave = () => {
   emits('leave')
   timeline.value?.kill()
+  cancelExtra()
 
   // Reset extra text (will re-animate on next enter)
   if (extraEl.value) gsap.set(extraEl.value, { opacity: 0 })
@@ -151,6 +159,11 @@ const handleInteraction = (active: boolean) => {
     navigator.vibrate([40, 60, 40])
   }
 }
+
+onUnmounted(() => {
+  cancelExtra()
+  timeline.value?.kill()
+})
 </script>
 
 <style scoped>

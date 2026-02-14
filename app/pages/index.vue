@@ -18,8 +18,9 @@
     </SectionWrapper>
 
     <!-- Months Journey -->
-    <MonthSection v-for="(month, index) in months" :key="month.name" v-bind="month"
-      :id="`month-${month.name.toLowerCase()}`" :class="{ 'text-accent-warm': month.name === 'October' }"
+    <MonthSection v-for="month in months" :key="month.name" v-bind="month"
+      :month="month.name" :id="`month-${month.name.toLowerCase()}`"
+      :class="{ 'text-accent-warm': month.name === 'October' }"
       @enter="handleMonthEnter(month.name)" @leave="handleMonthLeave(month.name)" />
 
     <!-- Final Section -->

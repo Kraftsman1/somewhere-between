@@ -31,18 +31,21 @@ onMounted(() => {
     const entry = entries[0]
     if (!entry) return
 
-    if (entry.isIntersecting) {
+    if (entry.intersectionRatio >= 0.3) {
+      // Section is at least 30% visible — reveal it
       emits('enter')
       content.classList.remove('reveal-out-up', 'reveal-out-down')
       content.classList.add('reveal-in')
-    } else {
+    } else if (entry.intersectionRatio <= 0.05) {
+      // Section is almost fully gone — hide it
+      // Hysteresis gap (0.05–0.3) prevents false leaves during snap animation
       emits('leave')
       const exitedUpward = entry.boundingClientRect.top < 0
       content.classList.remove('reveal-in')
       content.classList.add(exitedUpward ? 'reveal-out-up' : 'reveal-out-down')
     }
   }, {
-    threshold: 0.4  // lower than 0.5 — more reliable with fast snap scrolling
+    threshold: [0, 0.05, 0.1, 0.2, 0.3, 0.5, 1.0]
   })
 
   observer.observe(el)
