@@ -4,7 +4,17 @@ export default defineNuxtConfig({
   modules: ['@nuxtjs/tailwindcss'],
   css: ['~/assets/css/main.css'],
   app: {
+    baseURL: "/somewhere-between",
+    buildAssetsDir: "/_nuxt/",
+    
     head: {
+      title: "Somewhere Between",
+      meta: [
+        { charset: "utf-8" },
+        { name: "viewport", content: "width=device-width, initial-scale=1" },
+        { hid: "description", name: "description", content: "Avva Landing" },
+        { name: "format-detection", content: "telephone=no" },
+      ],
       link: [
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: 'anonymous' },
@@ -14,4 +24,9 @@ export default defineNuxtConfig({
   },
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true }
+  
+  nitro: {
+    preset: "github-pages",
+  },
+  
 })
