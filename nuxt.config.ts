@@ -12,7 +12,7 @@ export default defineNuxtConfig({
       meta: [
         { charset: "utf-8" },
         { name: "viewport", content: "width=device-width, initial-scale=1" },
-        { hid: "description", name: "description", content: "Avva Landing" },
+        { hid: "description", name: "description", content: "Somewhere Between" },
         { name: "format-detection", content: "telephone=no" },
       ],
       link: [
@@ -23,7 +23,7 @@ export default defineNuxtConfig({
     }
   },
   compatibilityDate: '2025-07-15',
-  devtools: { enabled: true }
+  devtools: { enabled: true },
   
   nitro: {
     preset: "github-pages",
