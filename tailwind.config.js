@@ -12,7 +12,9 @@ export default {
         extend: {
             colors: {
                 bg: 'var(--color-bg)',
+                surface: 'var(--color-surface)',
                 text: 'var(--color-text)',
+                'text-muted': 'var(--color-text-muted)',
                 accent: 'var(--color-accent)',
                 'accent-warm': 'var(--color-accent-warm)',
             },

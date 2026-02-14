@@ -1,41 +1,47 @@
 <template>
   <div
-    class="fixed right-6 top-1/2 -translate-y-1/2 h-48 w-4 flex flex-col items-center justify-between z-40 hidden md:flex">
-    <!-- Progress Track -->
-    <div class="absolute h-full w-[1px] bg-accent/10">
-      <div ref="barRef" class="w-full bg-accent origin-top h-0 transition-opacity duration-500"></div>
+    class="fixed right-7 top-1/2 -translate-y-1/2 h-56 flex-col items-center justify-between z-40 max-md:hidden md:flex"
+    style="gap: 0;">
+
+    <!-- Track line -->
+    <div class="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-[1px] bg-accent/10"></div>
+
+    <!-- Segment ticks -->
+    <div
+      v-for="i in 13"
+      :key="i"
+      class="relative flex items-center justify-center transition-all duration-700"
+      style="height: calc(100% / 13);">
+      <div
+        class="transition-all duration-700 rounded-full"
+        :class="currentSegment >= i - 1
+          ? 'bg-accent w-[1px] opacity-80'
+          : 'bg-accent/25 w-[1px] opacity-50'"
+        :style="currentSegment >= i - 1
+          ? 'height: 10px;'
+          : 'height: 5px;'">
+      </div>
     </div>
 
-    <!-- Segment Markers -->
-    <div v-for="i in 13" :key="i"
-      class="relative w-1 h-1 rounded-full bg-accent/20 transition-all duration-700 hover:scale-150"
-      :class="{ 'bg-accent/60 scale-125': currentSegment >= i - 1 }"></div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-
-const barRef = ref(null)
 const currentSegment = ref(0)
 
+const updateProgress = () => {
+  const total = document.documentElement.scrollHeight - window.innerHeight
+  if (total <= 0) return
+  const progress = window.scrollY / total
+  currentSegment.value = Math.floor(progress * 13)
+}
+
 onMounted(() => {
-  if (barRef.value) {
-    gsap.to(barRef.value, {
-      height: '100%',
-      ease: 'none',
-      scrollTrigger: {
-        trigger: 'main', // Assuming main container
-        start: 'top top',
-        end: 'bottom bottom',
-        scrub: true,
-        onUpdate: (self) => {
-          // Update segment markers based on progress
-          currentSegment.value = Math.floor(self.progress * 13)
-        }
-      }
-    })
-  }
+  window.addEventListener('scroll', updateProgress, { passive: true })
+  updateProgress()
+})
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', updateProgress)
 })
 </script>

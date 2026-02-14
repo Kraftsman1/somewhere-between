@@ -6,8 +6,18 @@
 
     <!-- Landing Section -->
     <SectionWrapper @enter="handleMonthEnter('landing')" @leave="handleMonthLeave('landing')">
-      <h1 class="font-serif text-5xl md:text-7xl italic mb-6">A Year in <br /> Calm Moments</h1>
-      <p class="font-sans text-sm tracking-widest uppercase opacity-60">Scroll gently</p>
+      <div class="text-center">
+        <p class="font-sans text-[9px] tracking-[0.5em] uppercase text-accent/40 mb-10 font-light">2025 — 2026</p>
+        <h1 class="font-serif text-5xl md:text-7xl leading-[1.1] mb-3">
+          A Year in<br />
+          <em>Calm Moments</em>
+        </h1>
+        <div class="flex items-center justify-center gap-4 mt-10">
+          <div class="h-[1px] w-10 bg-accent/20"></div>
+          <p class="font-sans text-[9px] tracking-[0.5em] uppercase text-accent/40 font-light">Scroll gently</p>
+          <div class="h-[1px] w-10 bg-accent/20"></div>
+        </div>
+      </div>
     </SectionWrapper>
 
     <!-- Months Journey -->
@@ -17,44 +27,58 @@
 
     <!-- Final Section -->
     <SectionWrapper @enter="handleFinalEnter" @leave="handleMonthLeave('final')">
-      <div class="space-y-12">
-        <p class="font-serif text-2xl md:text-3xl italic">
-          Thank you for being the calmest part of my year.
-        </p>
+      <div class="space-y-14">
+
+        <div class="space-y-5">
+          <p class="font-serif text-2xl md:text-4xl italic leading-snug">
+            Thank you for being<br />the calmest part of my year.
+          </p>
+          <!-- Thin rule -->
+          <div class="flex justify-center mt-6">
+            <div class="h-[1px] w-12 bg-accent/25"></div>
+          </div>
+        </div>
+
         <HiddenNote>
           <template #content>
-            Happy Valentine's Day. <br /> I see you. I appreciate you.
+            Happy Valentine's Day.<br />
+            <span class="text-accent/80">I see you. I appreciate you.</span>
           </template>
         </HiddenNote>
 
-        <div ref="dedicatedMomentRef" class="mt-16 opacity-0 translate-y-4 transition-all duration-1000">
+        <!-- CTA: A dedicated moment -->
+        <div ref="dedicatedMomentRef" class="opacity-0 translate-y-4 transition-all duration-1000">
           <NuxtLink to="/valentine" class="group relative inline-flex flex-col items-center no-underline"
             @mouseenter="handleCTAInteraction(true)" @mouseleave="handleCTAInteraction(false)">
-            <!-- Decorative Background Glow -->
+
+            <!-- Ambient glow -->
             <div
-              class="absolute -inset-4 bg-accent/5 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000">
-            </div>
+              class="absolute -inset-6 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-[1200ms]"
+              style="background: radial-gradient(circle, rgba(190,152,152,0.12) 0%, transparent 70%);"></div>
 
             <div
-              class="relative px-8 py-4 border border-accent/20 rounded-full bg-white/5 backdrop-blur-sm group-hover:border-accent/40 transition-all duration-700">
-              <span class="text-xs md:text-sm tracking-[0.4em] uppercase text-accent font-sans">
+              class="relative px-10 py-4 bg-transparent group-hover:bg-accent/5 transition-all duration-700"
+              style="border: 1px solid rgba(190,152,152,0.2); border-radius: 2px;">
+              <span class="font-sans text-[10px] tracking-[0.5em] uppercase text-accent/70 group-hover:text-accent transition-colors duration-500 font-light">
                 A dedicated moment
               </span>
             </div>
 
-            <!-- Intent indicator -->
+            <!-- Descender arrow -->
             <div
-              class="mt-4 flex flex-col items-center space-y-2 opacity-40 group-hover:opacity-80 transition-opacity duration-1000">
-              <div class="w-[1px] h-8 bg-accent/30"></div>
-              <span class="text-[9px] tracking-[0.2em] uppercase italic">For you</span>
+              class="mt-5 flex flex-col items-center gap-2 opacity-35 group-hover:opacity-70 transition-opacity duration-700">
+              <div class="w-[1px] h-6 bg-accent/40"></div>
+              <span class="font-sans text-[8px] tracking-[0.3em] uppercase italic text-accent/60">For you</span>
             </div>
           </NuxtLink>
         </div>
 
+        <!-- Loop closure -->
         <div v-if="showLoopClosure"
-          class="mt-16 opacity-0 animate-fade-in text-xs tracking-widest uppercase opacity-40">
-          Some days don’t need much noise to feel meaningful.
+          class="animate-fade-in font-sans text-[9px] tracking-[0.4em] uppercase text-accent/35 font-light">
+          Some days don't need much noise to feel meaningful.
         </div>
+
       </div>
     </SectionWrapper>
 
@@ -77,13 +101,15 @@ const dedicatedMomentRef = ref<HTMLElement | null>(null)
 const showLoopClosure = ref(false)
 const activeMonth = ref<string | null>(null)
 
-const months = ref<{
-  name: string;
-  message: string;
-  interactionType?: 'resistance' | 'focus' | 'exhale' | 'pacing' | 'static';
-  extraText?: string;
-  extraDelay?: number;
-}[]>([
+type Month = {
+  name: string
+  message: string
+  interactionType?: 'resistance' | 'focus' | 'exhale' | 'pacing' | 'static'
+  extraText?: string
+  extraDelay?: number
+}
+
+const months = ref<Month[]>([
   { name: 'January', message: 'The year began with a quiet promise.', interactionType: 'resistance' },
   { name: 'February', message: 'Short days, long thoughts, and the comfort of returning.', extraText: 'Today felt like a good day to say this.', extraDelay: 7000 },
   { name: 'March', message: 'Slowly, light started to reclaim the afternoons.', interactionType: 'exhale' },
@@ -95,7 +121,7 @@ const months = ref<{
   { name: 'September', message: 'A shift in the air. The beauty of letting go.', extraText: 'Some things stay.', extraDelay: 2000 },
   { name: 'October', message: 'Some people make the year feel gentler just by existing.', extraText: 'October feels warmer for a reason.', extraDelay: 3000 },
   { name: 'November', message: 'The world drew close again. Coziness as a necessity.' },
-  { name: 'December', message: 'Looking back, I realized how much peace you brought.', extraText: 'Some days don’t need much noise to feel meaningful.', extraDelay: 4000 },
+  { name: 'December', message: 'Looking back, I realized how much peace you brought.', extraText: "Some days don\u2019t need much noise to feel meaningful.", extraDelay: 4000 },
 ])
 
 const handleCTAInteraction = (active: boolean) => {
@@ -106,8 +132,6 @@ const handleCTAInteraction = (active: boolean) => {
 
 const handleMonthEnter = (name: string) => {
   activeMonth.value = name
-
-  // Explicitly reset on enter to clear any previous state "stuck"
   isGlowing.value = false
   warmthLevel.value = 0
   depthLevel.value = 0
@@ -123,14 +147,12 @@ const handleMonthEnter = (name: string) => {
     depthLevel.value = 0.8
   }
 
-  // Re-sync stillness
   resetActivity()
 }
 
 const handleMonthLeave = (name: string) => {
   if (activeMonth.value === name) {
     activeMonth.value = null
-    // Reset to defaults on leave to ensure no "glow" hangs
     isGlowing.value = false
     warmthLevel.value = 0
     depthLevel.value = 0
@@ -142,7 +164,6 @@ const handleFinalEnter = () => {
   isGlowing.value = true
   warmthLevel.value = 0.25
 
-  // Reveal Dedicated Moment CTA
   if (dedicatedMomentRef.value) {
     gsap.to(dedicatedMomentRef.value, {
       opacity: 1,
@@ -158,7 +179,6 @@ const handleFinalEnter = () => {
 
 const checkStillness = () => {
   const now = Date.now()
-  // Trigger stillness if idle for 7s AND on February (or February-like states)
   if (now - lastActivity.value > 7000) {
     if (activeMonth.value === 'February' || activeMonth.value === 'final') {
       isStill.value = true
@@ -179,17 +199,10 @@ onMounted(() => {
   window.addEventListener('touchstart', resetActivity, { passive: true })
   ticker = setInterval(checkStillness, 1000)
 
-  // September Scroll-Back Logic
   ScrollTrigger.create({
     trigger: '#month-september',
     start: 'top center',
-    onUpdate: (self) => {
-      // Detect scrolling UP into september
-      if (self.direction === -1) {
-        // We could trigger something specific here, but since MonthSection 
-        // handles extraText on Enter, entering back from August also counts.
-      }
-    }
+    onUpdate: (_self) => {}
   })
 })
 
@@ -207,16 +220,11 @@ useHead({
 
 <style>
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 .animate-fade-in {
-  animation: fadeIn 2s ease-out forwards;
+  animation: fadeIn 2.5s ease-out forwards;
 }
 </style>
