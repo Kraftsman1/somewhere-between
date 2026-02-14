@@ -21,6 +21,7 @@ const emits = defineEmits(['enter', 'leave'])
 const sectionRef = ref<HTMLElement | null>(null)
 const contentRef = ref<HTMLElement | null>(null)
 let observer: IntersectionObserver | null = null
+let isEntered = false
 
 onMounted(() => {
   const el = sectionRef.value
@@ -31,21 +32,22 @@ onMounted(() => {
     const entry = entries[0]
     if (!entry) return
 
-    if (entry.intersectionRatio >= 0.3) {
-      // Section is at least 30% visible — reveal it
+    if (entry.intersectionRatio >= 0.3 && !isEntered) {
+      // First time crossing into view — fire once, ignore subsequent crossings (0.5, 1.0)
+      isEntered = true
       emits('enter')
       content.classList.remove('reveal-out-up', 'reveal-out-down')
       content.classList.add('reveal-in')
-    } else if (entry.intersectionRatio <= 0.05) {
-      // Section is almost fully gone — hide it
-      // Hysteresis gap (0.05–0.3) prevents false leaves during snap animation
+    } else if (entry.intersectionRatio <= 0.05 && isEntered) {
+      // Section is almost fully gone — fire leave once
+      isEntered = false
       emits('leave')
       const exitedUpward = entry.boundingClientRect.top < 0
       content.classList.remove('reveal-in')
       content.classList.add(exitedUpward ? 'reveal-out-up' : 'reveal-out-down')
     }
   }, {
-    threshold: [0, 0.05, 0.1, 0.2, 0.3, 0.5, 1.0]
+    threshold: [0, 0.05, 0.3]
   })
 
   observer.observe(el)

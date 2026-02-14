@@ -28,7 +28,7 @@
       <div class="space-y-10 text-center">
 
         <p class="font-serif text-[1.75rem] md:text-4xl italic leading-snug">
-          Thank you for being<br />the calmest part of my year.
+          Thank you for being<br />the calm in the quiet moments.
         </p>
 
         <HiddenNote>

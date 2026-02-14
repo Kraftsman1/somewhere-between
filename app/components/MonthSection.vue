@@ -93,20 +93,13 @@ const handleEnter = () => {
   cancelExtra()
   timeline.value = gsap.timeline()
 
-  // 'focus' — wrapper already handles the reveal; no extra opacity manipulation
-  // (the old opacity:0.35 start caused double-fade and faint text)
-
-  // 'pacing' — staggered line reveal (0.45s stagger, not 2s)
+  // 'pacing' — staggered line reveal via CSS transitions (more reliable than GSAP timeline)
   if (isLineByLine.value && container.value) {
-    const lines = container.value.querySelectorAll('.line-item')
-    gsap.set(lines, { opacity: 0, y: 10 })
-    timeline.value.to(lines, {
-      opacity: 1,
-      y: 0,
-      duration: 1.1,
-      stagger: 0.45,   // was 2s — caused 6s total wait on mobile
-      ease: 'power2.out'
-    }, 0.3)
+    const lineEls = Array.from(container.value.querySelectorAll<HTMLElement>('.line-item'))
+    lineEls.forEach((line, i) => {
+      line.style.transitionDelay = `${0.3 + i * 0.45}s`
+      line.classList.add('line-visible')
+    })
   }
 
   // Extra text reveal (delayed via setTimeout — more reliable than GSAP position param)
@@ -139,7 +132,10 @@ const handleLeave = () => {
 
   // Reset pacing lines for next enter
   if (isLineByLine.value && container.value) {
-    gsap.set(container.value.querySelectorAll('.line-item'), { opacity: 0, y: 10 })
+    container.value.querySelectorAll<HTMLElement>('.line-item').forEach(line => {
+      line.style.transitionDelay = '0s'
+      line.classList.remove('line-visible')
+    })
   }
 }
 
@@ -167,9 +163,14 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* Pacing lines start hidden — GSAP controls their reveal */
 .line-item {
   opacity: 0;
   transform: translateY(10px);
+  transition: opacity 1.1s cubic-bezier(0.16, 1, 0.3, 1), transform 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.line-item.line-visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 </style>
