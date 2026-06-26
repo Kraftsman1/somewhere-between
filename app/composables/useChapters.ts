@@ -1,86 +1,86 @@
-export type ChapterStatus = 'remembered' | 'unfolding'
+export type ChapterType = 'prologue' | 'reflection' | 'immersive'
+export type ChapterState = 'remembered' | 'preserved' | 'still-unfolding'
 
 export interface Chapter {
-  number: number
-  roman: string
+  id: string
   title: string
-  date: string         // ISO: 'YYYY-MM-DD' — used for time-gating
-  displayDate: string  // Human-readable: 'May 6, 2020'
-  reflection: string   // Paragraph(s) shown when a card unfolds; use \n\n for paragraph breaks
-  status: ChapterStatus
-  hasFullPage: boolean // true = show 'Continue →' link
-  route?: string       // e.g. '/april' — only set when hasFullPage is true
+  subtitle?: string
+  date: Date
+  displayDate: string
+  type: ChapterType
+  state: ChapterState
+  slug: string
+  reflection: string
+  hiddenNote?: string
 }
 
 export const useChapters = () => {
   const chapters: Chapter[] = [
     {
-      number: 1,
-      roman: 'I',
-      title: 'The First Hello',
-      date: '2020-05-06',
-      displayDate: 'May 6, 2020',
-      reflection: 'Some conversations begin so simply that you don\'t realize until later that everything changed inside them.',
-      status: 'remembered',
-      hasFullPage: false,
-    },
-    {
-      number: 2,
-      roman: 'II',
-      title: 'Finding Our Way Back',
-      date: '2022-01-01',
-      displayDate: '2022',
-      reflection: 'Some distances aren\'t measured in miles. And some returns feel more like arrivals than homecomings.',
-      status: 'remembered',
-      hasFullPage: false,
-    },
-    {
-      number: 3,
-      roman: 'III',
-      title: 'The Twelve Days',
-      date: '2024-12-01',
-      displayDate: 'December 2024',
-      reflection: 'There are stretches of time that don\'t feel like time at all. Just a steady presence that makes the ordinary feel significant.',
-      status: 'remembered',
-      hasFullPage: false,
-    },
-    {
-      number: 4,
-      roman: 'IV',
+      id: 'somewhere-between',
       title: 'Somewhere Between',
-      date: '2025-02-01',
-      displayDate: '2025',
+      date: new Date('2025-02-01'),
+      displayDate: 'February 2025',
+      type: 'prologue',
+      state: 'remembered',
+      slug: 'somewhere-between',
       reflection: 'A year of quiet moments, small joys, and the comfort of returning. Not every chapter needs a turning point to matter.',
-      status: 'remembered',
-      hasFullPage: true,
-      route: '/',
     },
     {
-      number: 5,
-      roman: 'V',
+      id: 'the-first-hello',
+      title: 'The First Hello',
+      date: new Date('2020-05-06'),
+      displayDate: 'May 6, 2020',
+      type: 'reflection',
+      state: 'remembered',
+      slug: 'the-first-hello',
+      reflection: 'Some conversations begin so simply that you don\'t realize until later that everything changed inside them.',
+    },
+    {
+      id: 'finding-our-way-back',
+      title: 'Finding Our Way Back',
+      date: new Date('2022-01-01'),
+      displayDate: '2022',
+      type: 'reflection',
+      state: 'remembered',
+      slug: 'finding-our-way-back',
+      reflection: 'Some distances aren\'t measured in miles. And some returns feel more like arrivals than homecomings.',
+    },
+    {
+      id: 'the-twelve-days',
+      title: 'The Twelve Days',
+      date: new Date('2024-12-01'),
+      displayDate: 'December 2024',
+      type: 'reflection',
+      state: 'remembered',
+      slug: 'the-twelve-days',
+      reflection: 'There are stretches of time that don\'t feel like time at all. Just a steady presence that makes the ordinary feel significant.',
+    },
+    {
+      id: 'healing',
       title: 'Healing',
-      date: '2026-04-01',
+      date: new Date('2026-04-01'),
       displayDate: 'April 2026',
+      type: 'immersive',
+      state: 'preserved',
+      slug: 'healing',
       reflection: 'Some victories don\'t arrive with celebration. They arrive after years of carrying something heavier than anyone else could see. I hope the days ahead continue to become gentler than the ones behind.',
-      status: 'remembered',
-      hasFullPage: true,
-      route: '/april',
     },
     {
-      number: 6,
-      roman: 'VI',
+      id: 'remembering',
       title: 'Remembering',
-      date: '2026-05-01',
+      date: new Date('2026-05-01'),
       displayDate: 'May 2026',
+      type: 'immersive',
+      state: 'preserved',
+      slug: 'remembering',
       reflection: 'Thirteen years. She was there through the ordinary days and the hard ones, asking nothing but presence in return. Some loves leave a shape that stays long after they\'re gone.\n\nFor Bibi.',
-      status: 'remembered',
-      hasFullPage: true,
-      route: '/may',
     },
   ]
 
   const getVisibleChapters = (): Chapter[] => {
-    const today = new Date().toISOString().split('T')[0]
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
     return chapters.filter(c => c.date <= today)
   }
 
