@@ -49,8 +49,8 @@ export const useChapters = () => {
     {
       id: 'the-twelve-days',
       title: 'The Twelve Days',
-      date: new Date('2024-12-01'),
-      displayDate: 'December 2024',
+      date: new Date('2025-12-25'),
+      displayDate: 'December 2025 – January 2026',
       type: 'reflection',
       state: 'remembered',
       slug: 'the-twelve-days',
@@ -81,7 +81,7 @@ export const useChapters = () => {
   const getVisibleChapters = (): Chapter[] => {
     const today = new Date()
     today.setUTCHours(0, 0, 0, 0)
-    return chapters.filter(c => c.date <= today)
+    return chapters.filter(c => c.date <= today).sort((a, b) => a.date.getTime() - b.date.getTime())
   }
 
   return { chapters, getVisibleChapters }

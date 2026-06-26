@@ -26,62 +26,10 @@
         <p class="font-sans text-[9px] tracking-[0.4em] uppercase text-accent/40 mt-3 font-light">A record of the story so far.</p>
       </div>
 
-      <!-- Timeline -->
+      <!-- Timeline — chronological order, prologue in its natural position -->
       <div>
 
-        <!-- Prologue (displayed separately, before numbered chapters) -->
-        <template v-if="prologue">
-          <div class="h-px w-full bg-accent/10 mb-8" />
-          <div
-            class="mb-8 cursor-pointer"
-            @click="toggleOpen(prologue.id)"
-          >
-            <div class="flex items-start justify-between gap-4">
-              <div class="space-y-1.5">
-                <p class="font-sans text-[8px] tracking-[0.4em] uppercase text-accent/40 font-light">Prologue</p>
-                <h2 class="font-serif text-[1.3rem] md:text-2xl text-text leading-snug">{{ prologue.title }}</h2>
-                <p class="font-sans text-[8px] tracking-[0.3em] uppercase text-accent/35 font-light">{{ prologue.displayDate }}</p>
-              </div>
-              <div class="shrink-0 pt-0.5">
-                <span
-                  class="font-sans text-[7px] tracking-[0.35em] uppercase font-light"
-                  :class="prologue.state === 'still-unfolding' ? 'text-accent/25 italic' : 'text-accent/50'"
-                >
-                  {{ prologue.state === 'still-unfolding' ? 'Still unfolding' : 'Remembered' }}
-                </span>
-              </div>
-            </div>
-
-            <div
-              class="overflow-hidden transition-all duration-700 ease-in-out"
-              :style="{ maxHeight: openId === prologue.id ? '500px' : '0px' }"
-            >
-              <div class="pt-6 space-y-4">
-                <p
-                  v-for="(para, i) in prologue.reflection.split('\n\n')"
-                  :key="i"
-                  class="font-serif text-base md:text-lg text-text/65 leading-relaxed italic"
-                >
-                  {{ para }}
-                </p>
-                <div class="pt-2">
-                  <div class="h-px w-8 bg-accent/20 mb-4" />
-                  <NuxtLink
-                    :to="`/chapters/${prologue.slug}`"
-                    class="font-sans text-[8px] tracking-[0.4em] uppercase text-accent/50 hover:text-accent/80 transition-colors duration-300 font-light"
-                    style="text-decoration: none;"
-                    @click.stop
-                  >
-                    Continue →
-                  </NuxtLink>
-                </div>
-              </div>
-            </div>
-          </div>
-        </template>
-
-        <!-- Numbered chapters (I–V) -->
-        <template v-for="(chapter, idx) in numberedChapters" :key="chapter.id">
+        <template v-for="chapter in allVisible" :key="chapter.id">
           <div class="h-px w-full bg-accent/10 mb-8" />
 
           <div
@@ -91,13 +39,12 @@
             <div class="flex items-start justify-between gap-4">
               <div class="space-y-1.5">
                 <p class="font-sans text-[8px] tracking-[0.4em] uppercase text-accent/40 font-light">
-                  Chapter {{ romanNumerals[idx] }}
+                  {{ chapter.type === 'prologue' ? 'Prologue' : `Chapter ${chapterNumerals.get(chapter.id)}` }}
                 </p>
                 <h2 class="font-serif text-[1.3rem] md:text-2xl text-text leading-snug">{{ chapter.title }}</h2>
                 <p class="font-sans text-[8px] tracking-[0.3em] uppercase text-accent/35 font-light">{{ chapter.displayDate }}</p>
               </div>
               <div class="shrink-0 pt-0.5">
-                <!-- 'preserved' intentionally shows as 'Remembered' — both states are complete -->
                 <span
                   class="font-sans text-[7px] tracking-[0.35em] uppercase font-light"
                   :class="chapter.state === 'still-unfolding' ? 'text-accent/25 italic' : 'text-accent/50'"
@@ -125,7 +72,7 @@
                   Some memories are complete exactly as they are.
                 </p>
 
-                <div v-if="chapter.type === 'immersive'" class="pt-2">
+                <div v-if="chapter.type === 'prologue' || chapter.type === 'immersive'" class="pt-2">
                   <div class="h-px w-8 bg-accent/20 mb-4" />
                   <NuxtLink
                     :to="`/chapters/${chapter.slug}`"
@@ -167,8 +114,15 @@ const { getVisibleChapters } = useChapters()
 const romanNumerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X']
 
 const allVisible = computed(() => getVisibleChapters())
-const prologue = computed(() => allVisible.value.find(c => c.type === 'prologue') ?? null)
-const numberedChapters = computed(() => allVisible.value.filter(c => c.type !== 'prologue'))
+
+const chapterNumerals = computed(() => {
+  const map = new Map<string, string>()
+  let idx = 0
+  for (const c of allVisible.value) {
+    if (c.type !== 'prologue') map.set(c.id, romanNumerals[idx++])
+  }
+  return map
+})
 
 const openId = ref<string | null>(null)
 const pageEl = ref<HTMLElement | null>(null)
