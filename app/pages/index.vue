@@ -26,19 +26,25 @@
         </div>
 
         <!-- Continue CTA -->
-        <div ref="ctaRef" style="opacity: 0;" class="space-y-6">
+        <div ref="ctaRef" style="opacity: 0;">
           <button
             @click="handleContinue"
             class="font-sans text-[9px] tracking-[0.45em] uppercase text-accent/50 hover:text-accent/80 transition-colors duration-500 font-light cursor-pointer bg-transparent border-none"
           >
             Continue →
           </button>
-          <p class="font-sans text-[8px] tracking-[0.4em] uppercase text-accent/30 font-light">
-            scroll gently ↓
-          </p>
         </div>
 
       </div>
+    </div>
+
+    <!-- Scroll hint — appears after overlay dissolves, fades on first scroll -->
+    <div
+      ref="scrollHintRef"
+      class="fixed bottom-8 inset-x-0 z-40 flex justify-center pointer-events-none"
+      style="opacity: 0;"
+    >
+      <p class="font-sans text-[8px] tracking-[0.4em] uppercase text-accent/35 font-light">scroll gently ↓</p>
     </div>
 
     <AmbientBackground :is-still="isStill" :is-glowing="isGlowing" :warmth-level="warmthLevel"
@@ -117,6 +123,7 @@ const titleRef = ref<HTMLElement | null>(null)
 const paraRef = ref<HTMLElement | null>(null)
 const ctaRef = ref<HTMLElement | null>(null)
 const timestampRef = ref<HTMLElement | null>(null)
+const scrollHintRef = ref<HTMLElement | null>(null)
 const overlayVisible = ref(true)
 
 type Month = {
@@ -170,6 +177,9 @@ const handleContinue = () => {
     ease: 'sine.inOut',
     onComplete: () => {
       overlayVisible.value = false
+      if (scrollHintRef.value) {
+        gsap.to(scrollHintRef.value, { opacity: 1, duration: 1.5, ease: 'sine.inOut' })
+      }
     },
   })
 }
@@ -258,6 +268,9 @@ const checkStillness = () => {
 const resetActivity = () => {
   lastActivity.value = Date.now()
   isStill.value = false
+  if (scrollHintRef.value && scrollHintRef.value.style.opacity !== '0') {
+    gsap.to(scrollHintRef.value, { opacity: 0, duration: 1, ease: 'sine.inOut' })
+  }
 }
 
 let ticker: any = null
