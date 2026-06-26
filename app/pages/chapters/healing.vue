@@ -11,7 +11,7 @@
     <template #easter-egg>
       <div class="flex flex-col items-center gap-3">
         <EasterEgg
-          trigger="hover"
+          trigger="click"
           icon="◦"
           label="A quiet note"
           content="Healing isn't always visible."

@@ -3,7 +3,6 @@
     class="relative min-h-[100dvh] w-full flex flex-col items-center justify-center overflow-hidden"
     style="background-color: var(--color-bg);"
     @click="onPageClick"
-    @touchstart.passive="onPageClick"
   >
     <!-- Ambient background -->
     <AmbientBackground :is-glowing="isGlowing" :warmth-level="warmthLevel" />
