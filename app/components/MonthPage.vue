@@ -17,7 +17,7 @@
 
     <!-- Back link -->
     <NuxtLink
-      to="/"
+      :to="backRoute ?? '/'"
       class="fixed top-6 left-6 z-40 flex items-center gap-2 group"
       style="text-decoration: none;"
     >
@@ -126,6 +126,7 @@ const props = defineProps<{
   slides: Slide[]
   particleType: ParticleType
   ambientWarmth?: number
+  backRoute?: string
 }>()
 
 const currentIndex = ref(0)

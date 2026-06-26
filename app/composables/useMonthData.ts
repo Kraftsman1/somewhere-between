@@ -85,7 +85,7 @@ export const useMonthData = () => {
     {
       name: 'April',
       number: 4,
-      route: '/april',
+      route: '/chapters/healing',
       theme: 'Quiet Strength',
       themeTagline: 'some victories arrive quietly',
       slides: [
@@ -115,7 +115,7 @@ export const useMonthData = () => {
     {
       name: 'May',
       number: 5,
-      route: '/may',
+      route: '/chapters/remembering',
       theme: 'Enduring Love',
       themeTagline: 'some loves leave a shape that stays',
       slides: [

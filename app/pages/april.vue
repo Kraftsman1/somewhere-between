@@ -1,31 +1,10 @@
 <template>
-  <MonthPage
-    month-name="April"
-    :month-number="4"
-    :theme-tagline="month.themeTagline"
-    :slides="slides"
-    particle-type="none"
-    :ambient-warmth="month.ambientWarmth"
-  >
-    <template #easter-egg>
-      <div class="flex flex-col items-center gap-3">
-        <EasterEgg
-          trigger="hover"
-          icon="◦"
-          label="A quiet note"
-          content="Healing isn't always visible."
-          sub-content="I'm proud of you anyway."
-        />
-      </div>
-    </template>
-  </MonthPage>
+  <div />
 </template>
 
 <script setup lang="ts">
-const { getMonthByRoute } = useMonthData()
-const month = getMonthByRoute('/april')!
-const slides = month.slides
-
 definePageMeta({ layout: false })
-useHead({ title: 'April — Somewhere Between' })
+onMounted(() => {
+  navigateTo('/chapters/healing', { replace: true })
+})
 </script>
