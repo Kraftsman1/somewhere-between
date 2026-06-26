@@ -26,13 +26,16 @@
         </div>
 
         <!-- Continue CTA -->
-        <div ref="ctaRef" style="opacity: 0;">
+        <div ref="ctaRef" style="opacity: 0;" class="space-y-6">
           <button
             @click="handleContinue"
             class="font-sans text-[9px] tracking-[0.45em] uppercase text-accent/50 hover:text-accent/80 transition-colors duration-500 font-light cursor-pointer bg-transparent border-none"
           >
             Continue →
           </button>
+          <p class="font-sans text-[8px] tracking-[0.4em] uppercase text-accent/30 font-light">
+            scroll gently ↓
+          </p>
         </div>
 
       </div>
