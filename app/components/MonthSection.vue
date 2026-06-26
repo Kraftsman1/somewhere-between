@@ -49,6 +49,15 @@
       </div>
 
       <slot name="extra" />
+
+      <!-- Very subtle dedicated route link -->
+      <div v-if="month" class="mt-8 transition-opacity duration-1000 opacity-0 group-hover:opacity-100">
+        <NuxtLink :to="`/${month.toLowerCase()}`"
+          class="inline-block px-4 py-2 text-[8px] md:text-[9px] font-sans uppercase tracking-[0.4em] text-accent/20 hover:text-accent/60 transition-colors duration-500 font-light"
+          style="text-decoration: none;">
+          open —
+        </NuxtLink>
+      </div>
     </div>
   </SectionWrapper>
 </template>
