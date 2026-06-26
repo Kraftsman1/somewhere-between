@@ -74,17 +74,17 @@
                   {{ para }}
                 </p>
 
-                <!-- Footer line for reflection-only chapters (Part I — Remembered) -->
-                <p v-if="!chapter.hasFullPage"
+                <!-- Footer line for reflection-only chapters -->
+                <p v-if="chapter.type === 'reflection'"
                   class="font-serif text-sm text-text/30 italic pt-2">
                   Some memories are complete exactly as they are.
                 </p>
 
-                <!-- Link for full-page chapters (Part II — Lived) -->
-                <div v-if="chapter.hasFullPage" class="pt-2">
+                <!-- Link for immersive chapters -->
+                <div v-if="chapter.type === 'immersive'" class="pt-2">
                   <div class="h-px w-8 bg-accent/20 mb-4" />
                   <NuxtLink
-                    :to="chapter.route!"
+                    :to="'/chapters/' + chapter.slug"
                     class="font-sans text-[8px] tracking-[0.4em] uppercase text-accent/50 hover:text-accent/80 transition-colors duration-300 font-light"
                     style="text-decoration: none;"
                     @click.stop
