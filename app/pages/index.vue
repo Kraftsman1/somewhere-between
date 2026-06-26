@@ -1,21 +1,46 @@
 <template>
   <NuxtLayout>
+    <!-- Landing overlay — dissolves on Continue → -->
+    <div
+      v-if="overlayVisible"
+      ref="overlayRef"
+      class="fixed inset-0 z-50 flex items-center justify-center px-8"
+      style="background-color: var(--color-bg);"
+    >
+      <div class="max-w-xs w-full text-center space-y-10">
+
+        <!-- Title -->
+        <div ref="titleRef" style="opacity: 0;">
+          <h1 class="font-serif text-[2.2rem] md:text-5xl leading-snug">Somewhere Between</h1>
+        </div>
+
+        <!-- Paragraph with rotating word -->
+        <div ref="paraRef" style="opacity: 0;">
+          <p class="font-serif text-base md:text-lg leading-relaxed text-text/70 italic">
+            <template v-if="introWord !== 'home'">There are <em>{{ introWord }}</em> that never asked to be extraordinary.</template>
+            <template v-else>There is <em>home</em>.</template>
+            They arrived quietly, stayed longer than expected, and, somewhere along the way, became part of the story.
+            Some were joyful. Some were difficult. Most were ordinary in the moment, only revealing their meaning much later.
+            This is simply a place where a few of those moments are remembered.
+          </p>
+        </div>
+
+        <!-- Continue CTA -->
+        <div ref="ctaRef" style="opacity: 0;">
+          <button
+            @click="handleContinue"
+            class="font-sans text-[9px] tracking-[0.45em] uppercase text-accent/50 hover:text-accent/80 transition-colors duration-500 font-light cursor-pointer bg-transparent border-none"
+          >
+            Continue →
+          </button>
+        </div>
+
+      </div>
+    </div>
+
     <AmbientBackground :is-still="isStill" :is-glowing="isGlowing" :warmth-level="warmthLevel"
       :depth-level="depthLevel" />
     <ProgressIndicator />
-
-    <!-- Landing Section -->
-    <SectionWrapper @enter="handleMonthEnter('landing')" @leave="handleMonthLeave('landing')">
-      <div class="text-center">
-        <p class="font-sans text-[9px] tracking-[0.5em] uppercase text-accent/35 mb-8 font-light">2025 — 2026</p>
-        <h1 class="font-serif text-[2.6rem] md:text-7xl leading-[1.1]">
-          A Year in<br /><em>Calm Moments</em>
-        </h1>
-        <div class="flex items-center gap-3 mt-10 justify-center">
-          <p class="font-sans text-[9px] tracking-[0.45em] uppercase text-accent/40 font-light">Scroll gently</p>
-        </div>
-      </div>
-    </SectionWrapper>
 
     <!-- Months Journey -->
     <MonthSection v-for="month in months" :key="month.name" v-bind="month"
@@ -52,6 +77,12 @@
           </NuxtLink>
         </div>
 
+        <div ref="timestampRef" class="opacity-0 mt-8">
+          <p class="font-sans text-[7px] tracking-[0.35em] uppercase text-accent/25 font-light">
+            Last updated quietly · June 2026
+          </p>
+        </div>
+
       </div>
     </SectionWrapper>
 
@@ -59,7 +90,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
@@ -77,6 +108,13 @@ const closingLine3Ref = ref<HTMLElement | null>(null)  // "Some stories aren't f
 const invitationRef = ref<HTMLElement | null>(null)    // "The Quiet Chapters →"
 const invitationRevealed = ref(false)
 const activeMonth = ref<string | null>(null)
+
+const overlayRef = ref<HTMLElement | null>(null)
+const titleRef = ref<HTMLElement | null>(null)
+const paraRef = ref<HTMLElement | null>(null)
+const ctaRef = ref<HTMLElement | null>(null)
+const timestampRef = ref<HTMLElement | null>(null)
+const overlayVisible = ref(true)
 
 type Month = {
   name: string
@@ -99,8 +137,38 @@ const months = ref<Month[]>([
   { name: 'September', message: 'A shift in the air. The beauty of letting go.', extraText: 'Some things stay.', extraDelay: 2000, theme: getMonthByNumber(9)?.theme },
   { name: 'October', message: 'Some people make the year feel gentler just by existing.', extraText: 'October feels warmer for a reason.', extraDelay: 3000, theme: getMonthByNumber(10)?.theme },
   { name: 'November', message: 'The world drew close again. Coziness as a necessity.', theme: getMonthByNumber(11)?.theme },
-  { name: 'December', message: 'Looking back, I realized how much peace you brought.', extraText: "Some days don\u2019t need much noise to feel meaningful.", extraDelay: 4000, theme: getMonthByNumber(12)?.theme },
+  { name: 'December', message: 'Looking back, I realized how much peace you brought.', extraText: "Some days don’t need much noise to feel meaningful.", extraDelay: 4000, theme: getMonthByNumber(12)?.theme },
 ])
+
+const introWords = ['moments', 'conversations', 'seasons', 'memories', 'beginnings', 'home']
+
+const introWord = computed(() => {
+  const count = parseInt(localStorage.getItem('sb_visit_count') ?? '0')
+  return introWords[count % introWords.length]
+})
+
+const handleContinue = () => {
+  // Increment visit counter for next session
+  const count = parseInt(localStorage.getItem('sb_visit_count') ?? '0')
+  localStorage.setItem('sb_visit_count', String(count + 1))
+
+  // Re-enable scroll immediately so she can see February emerge beneath
+  document.documentElement.style.overflow = ''
+
+  if (!overlayRef.value) {
+    overlayVisible.value = false
+    return
+  }
+
+  gsap.to(overlayRef.value, {
+    opacity: 0,
+    duration: 1.8,
+    ease: 'sine.inOut',
+    onComplete: () => {
+      overlayVisible.value = false
+    },
+  })
+}
 
 const handleMonthEnter = (name: string) => {
   activeMonth.value = name
@@ -159,6 +227,15 @@ const handleFinalEnter = () => {
       ease: 'sine.inOut',
     })
   }
+
+  if (timestampRef.value) {
+    gsap.to(timestampRef.value, {
+      opacity: 1,
+      duration: 2,
+      delay: 10,
+      ease: 'sine.inOut',
+    })
+  }
 }
 
 const checkStillness = () => {
@@ -182,6 +259,20 @@ const resetActivity = () => {
 let ticker: any = null
 
 onMounted(() => {
+  // Disable scroll until Continue is pressed
+  document.documentElement.style.overflow = 'hidden'
+
+  // Overlay reveal sequence
+  if (titleRef.value) {
+    gsap.to(titleRef.value, { opacity: 1, duration: 2, delay: 0.5, ease: 'sine.inOut' })
+  }
+  if (paraRef.value) {
+    gsap.to(paraRef.value, { opacity: 1, duration: 1.8, delay: 3, ease: 'sine.inOut' })
+  }
+  if (ctaRef.value) {
+    gsap.to(ctaRef.value, { opacity: 1, duration: 1.5, delay: 5.5, ease: 'sine.inOut' })
+  }
+
   window.addEventListener('scroll', resetActivity, { passive: true })
   window.addEventListener('mousemove', resetActivity)
   window.addEventListener('touchstart', resetActivity, { passive: true })
@@ -195,6 +286,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  document.documentElement.style.overflow = ''
   window.removeEventListener('scroll', resetActivity)
   window.removeEventListener('mousemove', resetActivity)
   window.removeEventListener('touchstart', resetActivity)
