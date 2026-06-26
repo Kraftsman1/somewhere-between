@@ -28,40 +28,27 @@
       <div class="space-y-10 text-center">
 
         <p class="font-serif text-[1.75rem] md:text-4xl italic leading-snug">
-          Thank you for being<br />the calm in the quiet moments.
+          Thank you for being in these quiet moments.
         </p>
 
-        <HiddenNote>
-          <template #content>
-            Happy Valentine's Day.<br />
-            <span class="text-accent/75">I see you. I appreciate you.</span>
-          </template>
-        </HiddenNote>
-
-        <!-- CTA: A dedicated moment -->
-        <div ref="dedicatedMomentRef" class="opacity-0">
-          <NuxtLink
-            to="/valentine"
-            class="group relative inline-flex flex-col items-start no-underline"
-            @mouseenter="handleCTAInteraction(true)"
-            @mouseleave="handleCTAInteraction(false)">
-
-            <div
-              class="relative px-8 py-3.5 bg-transparent active:bg-accent/5 group-hover:bg-accent/5 transition-colors duration-500"
-              style="border: 1px solid rgba(190,152,152,0.22); border-radius: 2px;">
-              <span class="font-sans text-[9px] md:text-[10px] tracking-[0.45em] uppercase text-accent/65 group-hover:text-accent/90 active:text-accent transition-colors duration-500 font-light">
-                A dedicated moment for you
-              </span>
-            </div>
-
-
-          </NuxtLink>
+        <div ref="closingLine2Ref" class="opacity-0">
+          <p class="font-sans text-[9px] tracking-[0.4em] uppercase text-accent/30 font-light">
+            Some days don't need much noise to feel meaningful.
+          </p>
         </div>
 
-        <!-- Loop closure -->
-        <div v-if="showLoopClosure"
-          class="animate-fade-in font-sans text-[9px] tracking-[0.4em] uppercase text-accent/30 font-light">
-          Some days don't need much noise to feel meaningful.
+        <div ref="closingLine3Ref" class="opacity-0">
+          <p class="font-serif text-lg md:text-xl italic text-text/55 leading-snug">
+            Some stories aren't finished where the page ends.
+          </p>
+        </div>
+
+        <div ref="invitationRef" class="opacity-0">
+          <NuxtLink to="/chapters" style="text-decoration: none;">
+            <span class="font-sans text-[9px] md:text-[10px] tracking-[0.45em] uppercase text-accent/50 hover:text-accent/80 transition-colors duration-500 font-light">
+              The Quiet Chapters →
+            </span>
+          </NuxtLink>
         </div>
 
       </div>
@@ -82,8 +69,9 @@ const isGlowing = ref(false)
 const warmthLevel = ref(0)
 const depthLevel = ref(0)
 const lastActivity = ref(Date.now())
-const dedicatedMomentRef = ref<HTMLElement | null>(null)
-const showLoopClosure = ref(false)
+const closingLine2Ref = ref<HTMLElement | null>(null)  // "Some days don't need..."
+const closingLine3Ref = ref<HTMLElement | null>(null)  // "Some stories aren't finished..."
+const invitationRef = ref<HTMLElement | null>(null)    // "The Quiet Chapters →"
 const activeMonth = ref<string | null>(null)
 
 type Month = {
@@ -98,8 +86,8 @@ const months = ref<Month[]>([
   { name: 'January', message: 'The year began with a quiet promise.', interactionType: 'resistance' },
   { name: 'February', message: 'Short days, long thoughts, and the comfort of returning.', extraText: 'Today felt like a good day to say this.', extraDelay: 7000 },
   { name: 'March', message: 'Slowly, light started to reclaim the afternoons.', interactionType: 'exhale' },
-  { name: 'April', message: 'Rain against the window, a rhythm of steady growth.', interactionType: 'focus' },
-  { name: 'May', message: 'Flowers bloomed, not for show, but because they had to.', interactionType: 'focus' },
+  { name: 'April', message: 'Some victories don\'t announce themselves.', interactionType: 'focus' },
+  { name: 'May', message: 'Some loves leave a shape that stays.', interactionType: 'focus' },
   { name: 'June', message: 'The warmth arrived,\nsettling into the corners\nof the day.', interactionType: 'pacing' },
   { name: 'July', message: 'Stillness in the heat. A pause in the middle of everything.', interactionType: 'static' },
   { name: 'August', message: 'Golden hours that felt like they would last forever.' },
@@ -109,22 +97,13 @@ const months = ref<Month[]>([
   { name: 'December', message: 'Looking back, I realized how much peace you brought.', extraText: "Some days don\u2019t need much noise to feel meaningful.", extraDelay: 4000 },
 ])
 
-const handleCTAInteraction = (active: boolean) => {
-  if (active && typeof navigator !== 'undefined' && 'vibrate' in navigator) {
-    navigator.vibrate(10)
-  }
-}
-
 const handleMonthEnter = (name: string) => {
   activeMonth.value = name
   isGlowing.value = false
   warmthLevel.value = 0
   depthLevel.value = 0
 
-  if (name === 'May') {
-    isGlowing.value = true
-    warmthLevel.value = 0.4
-  } else if (name === 'October') {
+  if (name === 'October') {
     warmthLevel.value = 0.5
   } else if (name === 'February') {
     warmthLevel.value = 0.15
@@ -149,24 +128,43 @@ const handleFinalEnter = () => {
   isGlowing.value = true
   warmthLevel.value = 0.25
 
-  if (dedicatedMomentRef.value) {
-    gsap.to(dedicatedMomentRef.value, {
+  if (closingLine2Ref.value) {
+    gsap.to(closingLine2Ref.value, {
       opacity: 1,
-      y: 0,
-      duration: 2,
-      delay: 1.5,
-      ease: 'expo.out'
+      duration: 1.5,
+      delay: 3,
+      ease: 'sine.inOut',
     })
   }
 
-  setTimeout(() => { showLoopClosure.value = true }, 5000)
+  if (closingLine3Ref.value) {
+    gsap.to(closingLine3Ref.value, {
+      opacity: 1,
+      duration: 1.5,
+      delay: 5.5,
+      ease: 'sine.inOut',
+    })
+  }
+
+  if (invitationRef.value) {
+    gsap.to(invitationRef.value, {
+      opacity: 1,
+      duration: 1.5,
+      delay: 8,
+      ease: 'sine.inOut',
+    })
+  }
 }
 
 const checkStillness = () => {
   const now = Date.now()
-  if (now - lastActivity.value > 7000) {
+  if (now - lastActivity.value > 5000) {
     if (activeMonth.value === 'February' || activeMonth.value === 'final') {
       isStill.value = true
+    }
+    if (activeMonth.value === 'final' && invitationRef.value) {
+      // Reveal invitation early if user is still — GSAP handles already-animating gracefully
+      gsap.to(invitationRef.value, { opacity: 1, duration: 1.5, ease: 'sine.inOut' })
     }
   }
 }
@@ -204,12 +202,4 @@ useHead({
 </script>
 
 <style>
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-.animate-fade-in {
-  animation: fadeIn 2.5s ease-out forwards;
-}
 </style>
