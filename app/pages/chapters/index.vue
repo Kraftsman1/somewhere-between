@@ -28,42 +28,84 @@
 
       <!-- Timeline -->
       <div>
-        <template v-for="chapter in visibleChapters" :key="chapter.number">
-          <!-- Rule above each entry -->
-          <div class="h-px w-full bg-accent/10 mb-8" />
 
-          <!-- Chapter card -->
+        <!-- Prologue (displayed separately, before numbered chapters) -->
+        <template v-if="prologue">
+          <div class="h-px w-full bg-accent/10 mb-8" />
           <div
             class="mb-8 cursor-pointer"
-            @click="toggleChapter(chapter.number)"
+            @click="toggleOpen(prologue.id)"
           >
-            <!-- Header row -->
             <div class="flex items-start justify-between gap-4">
               <div class="space-y-1.5">
-                <p class="font-sans text-[8px] tracking-[0.4em] uppercase text-accent/40 font-light">
-                  Chapter {{ chapter.roman }}
-                </p>
-                <h2 class="font-serif text-[1.3rem] md:text-2xl text-text leading-snug">
-                  {{ chapter.title }}
-                </h2>
-                <p class="font-sans text-[8px] tracking-[0.3em] uppercase text-accent/35 font-light">
-                  {{ chapter.displayDate }}
-                </p>
+                <p class="font-sans text-[8px] tracking-[0.4em] uppercase text-accent/40 font-light">Prologue</p>
+                <h2 class="font-serif text-[1.3rem] md:text-2xl text-text leading-snug">{{ prologue.title }}</h2>
+                <p class="font-sans text-[8px] tracking-[0.3em] uppercase text-accent/35 font-light">{{ prologue.displayDate }}</p>
               </div>
               <div class="shrink-0 pt-0.5">
-                <span
-                  class="font-sans text-[7px] tracking-[0.35em] uppercase font-light"
-                  :class="chapter.status === 'remembered' ? 'text-accent/50' : 'text-accent/25 italic'"
-                >
-                  {{ chapter.status === 'remembered' ? 'Remembered' : 'Still unfolding' }}
+                <span class="font-sans text-[7px] tracking-[0.35em] uppercase font-light text-accent/50">
+                  Remembered
                 </span>
               </div>
             </div>
 
-            <!-- Expandable content -->
             <div
               class="overflow-hidden transition-all duration-700 ease-in-out"
-              :style="{ maxHeight: openChapter === chapter.number ? '500px' : '0px' }"
+              :style="{ maxHeight: openId === prologue.id ? '500px' : '0px' }"
+            >
+              <div class="pt-6 space-y-4">
+                <p
+                  v-for="(para, i) in prologue.reflection.split('\n\n')"
+                  :key="i"
+                  class="font-serif text-base md:text-lg text-text/65 leading-relaxed italic"
+                >
+                  {{ para }}
+                </p>
+                <div class="pt-2">
+                  <div class="h-px w-8 bg-accent/20 mb-4" />
+                  <NuxtLink
+                    :to="`/chapters/${prologue.slug}`"
+                    class="font-sans text-[8px] tracking-[0.4em] uppercase text-accent/50 hover:text-accent/80 transition-colors duration-300 font-light"
+                    style="text-decoration: none;"
+                    @click.stop
+                  >
+                    Continue →
+                  </NuxtLink>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <!-- Numbered chapters (I–V) -->
+        <template v-for="(chapter, idx) in numberedChapters" :key="chapter.id">
+          <div class="h-px w-full bg-accent/10 mb-8" />
+
+          <div
+            class="mb-8 cursor-pointer"
+            @click="toggleOpen(chapter.id)"
+          >
+            <div class="flex items-start justify-between gap-4">
+              <div class="space-y-1.5">
+                <p class="font-sans text-[8px] tracking-[0.4em] uppercase text-accent/40 font-light">
+                  Chapter {{ romanNumerals[idx] }}
+                </p>
+                <h2 class="font-serif text-[1.3rem] md:text-2xl text-text leading-snug">{{ chapter.title }}</h2>
+                <p class="font-sans text-[8px] tracking-[0.3em] uppercase text-accent/35 font-light">{{ chapter.displayDate }}</p>
+              </div>
+              <div class="shrink-0 pt-0.5">
+                <span
+                  class="font-sans text-[7px] tracking-[0.35em] uppercase font-light"
+                  :class="chapter.state === 'still-unfolding' ? 'text-accent/25 italic' : 'text-accent/50'"
+                >
+                  {{ chapter.state === 'still-unfolding' ? 'Still unfolding' : 'Remembered' }}
+                </span>
+              </div>
+            </div>
+
+            <div
+              class="overflow-hidden transition-all duration-700 ease-in-out"
+              :style="{ maxHeight: openId === chapter.id ? '500px' : '0px' }"
             >
               <div class="pt-6 space-y-4">
                 <p
@@ -74,17 +116,15 @@
                   {{ para }}
                 </p>
 
-                <!-- Footer line for reflection-only chapters -->
                 <p v-if="chapter.type === 'reflection'"
                   class="font-serif text-sm text-text/30 italic pt-2">
                   Some memories are complete exactly as they are.
                 </p>
 
-                <!-- Link for immersive chapters -->
                 <div v-if="chapter.type === 'immersive'" class="pt-2">
                   <div class="h-px w-8 bg-accent/20 mb-4" />
                   <NuxtLink
-                    :to="'/chapters/' + chapter.slug"
+                    :to="`/chapters/${chapter.slug}`"
                     class="font-sans text-[8px] tracking-[0.4em] uppercase text-accent/50 hover:text-accent/80 transition-colors duration-300 font-light"
                     style="text-decoration: none;"
                     @click.stop
@@ -120,13 +160,17 @@ definePageMeta({ layout: false })
 useHead({ title: 'The Quiet Chapters — Somewhere Between' })
 
 const { getVisibleChapters } = useChapters()
+const romanNumerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X']
 
-const visibleChapters = ref(getVisibleChapters())
-const openChapter = ref<number | null>(null)
+const allVisible = computed(() => getVisibleChapters())
+const prologue = computed(() => allVisible.value.find(c => c.type === 'prologue') ?? null)
+const numberedChapters = computed(() => allVisible.value.filter(c => c.type !== 'prologue'))
+
+const openId = ref<string | null>(null)
 const pageEl = ref<HTMLElement | null>(null)
 
-const toggleChapter = (num: number) => {
-  openChapter.value = openChapter.value === num ? null : num
+const toggleOpen = (id: string) => {
+  openId.value = openId.value === id ? null : id
 }
 
 onMounted(() => {
