@@ -143,6 +143,7 @@ const months = ref<Month[]>([
 const introWords = ['moments', 'conversations', 'seasons', 'memories', 'beginnings', 'home']
 
 const introWord = computed(() => {
+  if (!import.meta.client) return introWords[0]
   const count = parseInt(localStorage.getItem('sb_visit_count') ?? '0')
   return introWords[count % introWords.length]
 })

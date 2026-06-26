@@ -43,8 +43,11 @@
                 <p class="font-sans text-[8px] tracking-[0.3em] uppercase text-accent/35 font-light">{{ prologue.displayDate }}</p>
               </div>
               <div class="shrink-0 pt-0.5">
-                <span class="font-sans text-[7px] tracking-[0.35em] uppercase font-light text-accent/50">
-                  Remembered
+                <span
+                  class="font-sans text-[7px] tracking-[0.35em] uppercase font-light"
+                  :class="prologue.state === 'still-unfolding' ? 'text-accent/25 italic' : 'text-accent/50'"
+                >
+                  {{ prologue.state === 'still-unfolding' ? 'Still unfolding' : 'Remembered' }}
                 </span>
               </div>
             </div>
@@ -94,6 +97,7 @@
                 <p class="font-sans text-[8px] tracking-[0.3em] uppercase text-accent/35 font-light">{{ chapter.displayDate }}</p>
               </div>
               <div class="shrink-0 pt-0.5">
+                <!-- 'preserved' intentionally shows as 'Remembered' — both states are complete -->
                 <span
                   class="font-sans text-[7px] tracking-[0.35em] uppercase font-light"
                   :class="chapter.state === 'still-unfolding' ? 'text-accent/25 italic' : 'text-accent/50'"

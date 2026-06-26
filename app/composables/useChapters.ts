@@ -80,7 +80,7 @@ export const useChapters = () => {
 
   const getVisibleChapters = (): Chapter[] => {
     const today = new Date()
-    today.setHours(0, 0, 0, 0)
+    today.setUTCHours(0, 0, 0, 0)
     return chapters.filter(c => c.date <= today)
   }
 
