@@ -72,6 +72,7 @@ const lastActivity = ref(Date.now())
 const closingLine2Ref = ref<HTMLElement | null>(null)  // "Some days don't need..."
 const closingLine3Ref = ref<HTMLElement | null>(null)  // "Some stories aren't finished..."
 const invitationRef = ref<HTMLElement | null>(null)    // "The Quiet Chapters →"
+const invitationRevealed = ref(false)
 const activeMonth = ref<string | null>(null)
 
 type Month = {
@@ -162,8 +163,8 @@ const checkStillness = () => {
     if (activeMonth.value === 'February' || activeMonth.value === 'final') {
       isStill.value = true
     }
-    if (activeMonth.value === 'final' && invitationRef.value) {
-      // Reveal invitation early if user is still — GSAP handles already-animating gracefully
+    if (activeMonth.value === 'final' && invitationRef.value && !invitationRevealed.value) {
+      invitationRevealed.value = true
       gsap.to(invitationRef.value, { opacity: 1, duration: 1.5, ease: 'sine.inOut' })
     }
   }
