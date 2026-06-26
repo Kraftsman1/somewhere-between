@@ -2,20 +2,19 @@
   <MonthPage
     month-name="April"
     :month-number="4"
-    theme-tagline="three things I admire"
+    :theme-tagline="month.themeTagline"
     :slides="slides"
     particle-type="none"
-    :ambient-warmth="0.15"
+    :ambient-warmth="month.ambientWarmth"
   >
     <template #easter-egg>
-      <!-- Flower SVG hover Easter egg -->
       <div class="flex flex-col items-center gap-3">
         <EasterEgg
           trigger="hover"
-          icon="✿"
-          label="Hover here"
-          content="Even small things you do stand out."
-          sub-content="You just don't always see it."
+          icon="◦"
+          label="A quiet note"
+          content="Healing isn't always visible."
+          sub-content="I'm proud of you anyway."
         />
       </div>
     </template>
