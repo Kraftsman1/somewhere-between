@@ -88,6 +88,7 @@ const extraEl = ref<HTMLElement | null>(null)
 
 const timeline = ref<gsap.core.Timeline | null>(null)
 let extraTimer: ReturnType<typeof setTimeout> | null = null
+const extraRevealed = ref(false)
 
 const cancelExtra = () => {
   if (extraTimer !== null) {
@@ -115,11 +116,12 @@ const handleEnter = () => {
     })
   }
 
-  // Extra text reveal (delayed via setTimeout — more reliable than GSAP position param)
-  if (props.extraText && extraEl.value) {
-    const delay = props.extraDelay ? Math.min(props.extraDelay, 4000) : 0
+  // Extra text reveal — skip if already shown
+  if (props.extraText && extraEl.value && !extraRevealed.value) {
+    const delay = props.extraDelay ?? 0
     const target = extraEl.value
     extraTimer = setTimeout(() => {
+      extraRevealed.value = true
       gsap.to(target, { opacity: 1, duration: 1.5, ease: 'sine.inOut' })
     }, delay)
   }
@@ -134,9 +136,6 @@ const handleLeave = () => {
   emits('leave')
   timeline.value?.kill()
   cancelExtra()
-
-  // Reset extra text (will re-animate on next enter)
-  if (extraEl.value) gsap.set(extraEl.value, { opacity: 0 })
 
   // Reset exhale effects
   if (messageEl.value) {
