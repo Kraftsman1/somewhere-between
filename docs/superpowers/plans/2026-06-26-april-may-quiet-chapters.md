@@ -36,7 +36,7 @@
 Create `app/composables/useChapters.ts` with this exact content:
 
 ```typescript
-export type ChapterStatus = 'written' | 'unfolding'
+export type ChapterStatus = 'remembered' | 'unfolding'
 
 export interface Chapter {
   number: number
@@ -46,7 +46,7 @@ export interface Chapter {
   displayDate: string  // Human-readable: 'May 6, 2020'
   reflection: string   // Paragraph(s) shown when a card unfolds; use \n\n for paragraph breaks
   status: ChapterStatus
-  hasFullPage: boolean // true = show 'Open Chapter →' link
+  hasFullPage: boolean // true = show 'Continue →' link
   route?: string       // e.g. '/april' — only set when hasFullPage is true
 }
 
@@ -59,7 +59,7 @@ export const useChapters = () => {
       date: '2020-05-06',
       displayDate: 'May 6, 2020',
       reflection: 'Some conversations begin so simply that you don\'t realize until later that everything changed inside them.',
-      status: 'written',
+      status: 'remembered',
       hasFullPage: false,
     },
     {
@@ -69,7 +69,7 @@ export const useChapters = () => {
       date: '2022-01-01',
       displayDate: '2022',
       reflection: 'Some distances aren\'t measured in miles. And some returns feel more like arrivals than homecomings.',
-      status: 'written',
+      status: 'remembered',
       hasFullPage: false,
     },
     {
@@ -79,7 +79,7 @@ export const useChapters = () => {
       date: '2024-12-01',
       displayDate: 'December 2024',
       reflection: 'There are stretches of time that don\'t feel like time at all. Just a steady presence that makes the ordinary feel significant.',
-      status: 'written',
+      status: 'remembered',
       hasFullPage: false,
     },
     {
@@ -89,7 +89,7 @@ export const useChapters = () => {
       date: '2025-02-01',
       displayDate: '2025',
       reflection: 'A year of quiet moments, small joys, and the comfort of returning. Not every chapter needs a turning point to matter.',
-      status: 'written',
+      status: 'remembered',
       hasFullPage: true,
       route: '/',
     },
@@ -100,7 +100,7 @@ export const useChapters = () => {
       date: '2026-04-01',
       displayDate: 'April 2026',
       reflection: 'Some victories don\'t arrive with celebration. They arrive after years of carrying something heavier than anyone else could see. I hope the days ahead continue to become gentler than the ones behind.',
-      status: 'written',
+      status: 'remembered',
       hasFullPage: true,
       route: '/april',
     },
@@ -111,7 +111,7 @@ export const useChapters = () => {
       date: '2026-05-01',
       displayDate: 'May 2026',
       reflection: 'Thirteen years. She was there through the ordinary days and the hard ones, asking nothing but presence in return. Some loves leave a shape that stays long after they\'re gone.\n\nFor Bibi.',
-      status: 'written',
+      status: 'remembered',
       hasFullPage: true,
       route: '/may',
     },
@@ -174,7 +174,7 @@ In `app/composables/useMonthData.ts`, find the April entry (currently `name: 'Ap
     },
     {
       text: 'Some victories don\'t arrive with celebration. They arrive quietly. After years of waiting.',
-      subtext: 'I think you\'ve earned this one.',
+      subtext: 'I hope this feels like the beginning of gentler days.',
     },
   ],
   easterEgg: {
@@ -421,7 +421,8 @@ onMounted(() => {
   })
 
   tl.to(followUp.value, { opacity: 1, duration: 1.8, ease: 'sine.inOut' }, '+=1.5')
-  tl.to(bibiEl.value, { opacity: 1, duration: 2, ease: 'sine.inOut' }, '+=4')
+  // Bibi's name: imperceptibly slow. She should almost wonder if she imagined it.
+  tl.to(bibiEl.value, { opacity: 0.65, duration: 4.5, ease: 'power1.inOut' }, '+=4')
 })
 </script>
 ```
@@ -477,11 +478,13 @@ Update the May entry (also remove the special `isGlowing`/`warmthLevel` casing �
 In the `<script setup>` block, find where `dedicatedMomentRef` is declared and replace it with:
 
 ```typescript
-const closingLine2Ref = ref<HTMLElement | null>(null)
-const invitationRef = ref<HTMLElement | null>(null)
+const closingLine2Ref = ref<HTMLElement | null>(null)  // "Some days don't need..."
+const closingLine3Ref = ref<HTMLElement | null>(null)  // "Some stories aren't finished..."
+const invitationRef = ref<HTMLElement | null>(null)    // "The Quiet Chapters →"
 ```
 
 Remove the `dedicatedMomentRef` declaration entirely.
+Remove the `showLoopClosure` ref — it's replaced by the GSAP-driven `closingLine2Ref`.
 
 - [ ] **Step 3: Update `handleMonthEnter` — remove May glow**
 
@@ -512,7 +515,11 @@ const handleCTAInteraction = (active: boolean) => {
 
 - [ ] **Step 5: Update `handleFinalEnter`**
 
-Replace the entire `handleFinalEnter` function:
+Replace the entire `handleFinalEnter` function. The ending now has four beats:
+1. "Thank you…" (visible on arrival — no animation needed, it's static in the template)
+2. "Some days don't need much noise…" at 3s
+3. "Some stories aren't finished…" at 5.5s
+4. "The Quiet Chapters →" at 8s (or earlier via stillness)
 
 ```typescript
 const handleFinalEnter = () => {
@@ -520,7 +527,6 @@ const handleFinalEnter = () => {
   isGlowing.value = true
   warmthLevel.value = 0.25
 
-  // Phase 1: second closing line fades in after 3s
   if (closingLine2Ref.value) {
     gsap.to(closingLine2Ref.value, {
       opacity: 1,
@@ -530,15 +536,20 @@ const handleFinalEnter = () => {
     })
   }
 
-  // Loop closure line at 5s
-  setTimeout(() => { showLoopClosure.value = true }, 5000)
+  if (closingLine3Ref.value) {
+    gsap.to(closingLine3Ref.value, {
+      opacity: 1,
+      duration: 1.5,
+      delay: 5.5,
+      ease: 'sine.inOut',
+    })
+  }
 
-  // Phase 2: invitation at 6s (stillness detection can also trigger it — whichever fires first)
   if (invitationRef.value) {
     gsap.to(invitationRef.value, {
       opacity: 1,
       duration: 1.5,
-      delay: 6,
+      delay: 8,
       ease: 'sine.inOut',
     })
   }
@@ -547,7 +558,7 @@ const handleFinalEnter = () => {
 
 - [ ] **Step 6: Update `checkStillness` to reveal invitation early**
 
-Find `checkStillness` and update it:
+Find `checkStillness` and update it. Also remove the `showLoopClosure` ref usage here if present:
 
 ```typescript
 const checkStillness = () => {
@@ -557,15 +568,18 @@ const checkStillness = () => {
       isStill.value = true
     }
     if (activeMonth.value === 'final' && invitationRef.value) {
+      // Reveal invitation early if user is still — GSAP handles already-animating gracefully
       gsap.to(invitationRef.value, { opacity: 1, duration: 1.5, ease: 'sine.inOut' })
     }
   }
 }
 ```
 
+Also remove the `showLoopClosure` ref and its `setTimeout` call from the script — it's been replaced by `closingLine2Ref`.
+
 - [ ] **Step 7: Replace the final SectionWrapper in the template**
 
-Find the final `<SectionWrapper>` block (the one with `@enter="handleFinalEnter"`) and replace its inner content entirely:
+Find the final `<SectionWrapper>` block (the one with `@enter="handleFinalEnter"`) and replace its inner content entirely. Four beats, all GSAP-driven (no v-if):
 
 ```vue
 <SectionWrapper @enter="handleFinalEnter" @leave="handleMonthLeave('final')">
@@ -576,14 +590,15 @@ Find the final `<SectionWrapper>` block (the one with `@enter="handleFinalEnter"
     </p>
 
     <div ref="closingLine2Ref" class="opacity-0">
-      <p class="font-serif text-lg md:text-xl italic text-text/65 leading-snug">
-        Some stories aren't finished where the page ends.
+      <p class="font-sans text-[9px] tracking-[0.4em] uppercase text-accent/30 font-light">
+        Some days don't need much noise to feel meaningful.
       </p>
     </div>
 
-    <div v-if="showLoopClosure"
-      class="animate-fade-in font-sans text-[9px] tracking-[0.4em] uppercase text-accent/30 font-light">
-      Some days don't need much noise to feel meaningful.
+    <div ref="closingLine3Ref" class="opacity-0">
+      <p class="font-serif text-lg md:text-xl italic text-text/55 leading-snug">
+        Some stories aren't finished where the page ends.
+      </p>
     </div>
 
     <div ref="invitationRef" class="opacity-0">
@@ -607,9 +622,9 @@ Check:
 - May scroll entry reads "Some loves leave a shape that stays."
 - May section no longer triggers an ambient glow on the homepage
 - Final section reads "Thank you for being in these quiet moments."
-- After ~3 seconds: "Some stories aren't finished where the page ends." fades in
-- After ~5 seconds: the loop closure line appears
-- After ~6 seconds (or after 5s of stillness): "The Quiet Chapters →" fades in
+- After ~3 seconds: "Some days don't need much noise to feel meaningful." fades in (small caps, Josefin Sans)
+- After ~5.5 seconds: "Some stories aren't finished where the page ends." fades in (italic serif)
+- After ~8 seconds (or after 5s of stillness): "The Quiet Chapters →" fades in
 - Clicking "The Quiet Chapters →" navigates to `/chapters` (will 404 until Task 6 is complete — that's expected)
 - No Valentine link or HiddenNote component appears anywhere in the final section
 
@@ -693,9 +708,9 @@ Create `app/pages/chapters.vue` with this exact content:
               <div class="shrink-0 pt-0.5">
                 <span
                   class="font-sans text-[7px] tracking-[0.35em] uppercase font-light"
-                  :class="chapter.status === 'written' ? 'text-accent/50' : 'text-accent/25 italic'"
+                  :class="chapter.status === 'remembered' ? 'text-accent/50' : 'text-accent/25 italic'"
                 >
-                  {{ chapter.status === 'written' ? 'Written' : 'Still unfolding' }}
+                  {{ chapter.status === 'remembered' ? 'Remembered' : 'Still unfolding' }}
                 </span>
               </div>
             </div>
@@ -714,6 +729,13 @@ Create `app/pages/chapters.vue` with this exact content:
                   {{ para }}
                 </p>
 
+                <!-- Footer line for reflection-only chapters (Part I — Remembered) -->
+                <p v-if="!chapter.hasFullPage"
+                  class="font-serif text-sm text-text/30 italic pt-2">
+                  Some memories are complete exactly as they are.
+                </p>
+
+                <!-- Link for full-page chapters (Part II — Lived) -->
                 <div v-if="chapter.hasFullPage" class="pt-2">
                   <div class="h-px w-8 bg-accent/20 mb-4" />
                   <NuxtLink
@@ -722,7 +744,7 @@ Create `app/pages/chapters.vue` with this exact content:
                     style="text-decoration: none;"
                     @click.stop
                   >
-                    Open Chapter →
+                    Continue →
                   </NuxtLink>
                 </div>
               </div>
@@ -782,8 +804,8 @@ Check:
 - Tapping Chapter I expands it: reflection text appears with smooth height animation
 - Tapping Chapter I again collapses it
 - Tapping Chapter II while Chapter I is open: Chapter I closes, Chapter II opens
-- Chapters V and VI (Healing, Remembering) show "Open Chapter →" when expanded
-- "Open Chapter →" on Chapter V links to `/april`; on Chapter VI links to `/may`
+- Chapters V and VI (Healing, Remembering) show "Continue →" when expanded
+- "Continue →" on Chapter V links to `/april`; on Chapter VI links to `/may`
 - Clicking "Open Chapter →" navigates correctly without also toggling the card
 - "The next chapter hasn't been written yet." appears at the bottom
 - Back link returns to `/`
@@ -801,7 +823,7 @@ git commit -m "feat: add /chapters page — The Quiet Chapters archive with time
 
 - All 6 spec requirements have corresponding tasks (data architecture → Task 1, April → Tasks 2+3, May → Tasks 2+4, homepage ending → Task 5, /chapters page → Task 6)
 - `useChapters` is auto-imported by Nuxt — no explicit import needed in `chapters.vue`
-- `@click.stop` on the "Open Chapter →" `NuxtLink` prevents the card toggle from firing when clicking the link
+- `@click.stop` on the "Continue →" `NuxtLink` prevents the card toggle from firing when clicking the link
 - The `reflection.split('\n\n')` in `chapters.vue` handles the May entry's two-paragraph reflection (separated by `\n\n` in `useChapters.ts`)
 - `checkStillness` in `index.vue` calls `gsap.to` on `invitationRef` which may already be animating via the 6s delay — GSAP handles this gracefully (it kills the pending tween and animates from current state)
 - The `/valentine` page is not deleted — it simply has no link pointing to it
