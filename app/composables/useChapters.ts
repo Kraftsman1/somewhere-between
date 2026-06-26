@@ -81,7 +81,13 @@ export const useChapters = () => {
   const getVisibleChapters = (): Chapter[] => {
     const today = new Date()
     today.setUTCHours(0, 0, 0, 0)
-    return chapters.filter(c => c.date <= today).sort((a, b) => a.date.getTime() - b.date.getTime())
+    return chapters
+      .filter(c => c.date <= today)
+      .sort((a, b) => {
+        if (a.type === 'prologue') return -1
+        if (b.type === 'prologue') return 1
+        return a.date.getTime() - b.date.getTime()
+      })
   }
 
   return { chapters, getVisibleChapters }
