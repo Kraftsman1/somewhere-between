@@ -2,10 +2,8 @@
   <div
     class="relative min-h-[100dvh] w-full flex flex-col items-center justify-center overflow-hidden"
     style="background-color: var(--color-bg);"
-    @click="onAnyClick"
-    @touchstart.passive="onAnyClick"
   >
-    <AmbientBackground :warmth-level="0.05" />
+    <AmbientBackground :warmth-level="0.08" />
 
     <!-- Grain -->
     <div class="fixed inset-0 z-[2] pointer-events-none opacity-50"
@@ -24,23 +22,23 @@
     <!-- Canvas text area -->
     <div class="relative z-20 max-w-md w-full px-8 text-center flex flex-col items-center gap-10">
 
-      <p class="font-sans text-[9px] tracking-[0.5em] uppercase text-accent/35 font-light">the quiet between</p>
+      <p class="font-sans text-[9px] tracking-[0.5em] uppercase text-accent/35 font-light">some loves leave a shape that stays</p>
 
       <!-- Word-by-word reveal -->
       <div class="space-y-8">
         <div ref="line1" class="overflow-hidden">
-          <p class="font-serif text-[2.5rem] md:text-6xl leading-snug canvas-line" style="opacity: 0; transform: translateY(30px);">
-            Sometimes
+          <p class="font-serif text-[2.5rem] md:text-6xl leading-snug" style="opacity: 0; transform: translateY(30px);">
+            Some loves
           </p>
         </div>
         <div ref="line2" class="overflow-hidden">
-          <p class="font-serif text-[2rem] md:text-5xl leading-snug italic canvas-line" style="opacity: 0; transform: translateY(30px);">
-            the quietest moments
+          <p class="font-serif text-[2rem] md:text-5xl leading-snug italic" style="opacity: 0; transform: translateY(30px);">
+            don't need words
           </p>
         </div>
         <div ref="line3" class="overflow-hidden">
-          <p class="font-serif text-[2.5rem] md:text-6xl leading-snug canvas-line" style="opacity: 0; transform: translateY(30px);">
-            say the most.
+          <p class="font-serif text-[2.5rem] md:text-6xl leading-snug" style="opacity: 0; transform: translateY(30px);">
+            to be understood.
           </p>
         </div>
       </div>
@@ -48,20 +46,25 @@
       <!-- Follow-up text -->
       <div ref="followUp" style="opacity: 0;">
         <p class="font-serif text-xl md:text-2xl leading-snug text-text/70 italic">
-          There's a kind of comfort in just being somewhere<br />at the same time as someone.
+          Thirteen years of presence. Of loyalty that never<br />asked for anything in return.
         </p>
         <p class="font-serif text-lg md:text-xl mt-4 leading-snug text-text/60 italic">
-          No performance. No explanation.<br />Just presence, and that being enough.
+          The kind of love that makes the house feel<br />different when it's gone.
         </p>
       </div>
 
-      <!-- Easter egg hint (corner trigger - shown after animation) -->
+      <!-- Bibi's name -->
+      <div ref="bibiEl" style="opacity: 0;">
+        <p class="font-serif text-xl md:text-2xl text-text/80 italic">Bibi.</p>
+      </div>
+
+      <!-- Easter egg — appears after full animation completes -->
       <div v-if="animDone" class="mt-4">
         <EasterEgg
           trigger="corner"
-          icon="♩"
-          content="Some silences are better than most conversations."
-          sub-content="This is one of them."
+          icon="·"
+          content="Love doesn't disappear."
+          sub-content="Sometimes it simply changes shape."
           corner-position="bottom-6 right-6"
         />
       </div>
@@ -79,43 +82,14 @@ const line1 = ref<HTMLElement | null>(null)
 const line2 = ref<HTMLElement | null>(null)
 const line3 = ref<HTMLElement | null>(null)
 const followUp = ref<HTMLElement | null>(null)
+const bibiEl = ref<HTMLElement | null>(null)
 const animDone = ref(false)
 
-// Web Audio chime — only fires after first user gesture (which is the click handler itself)
-let audioCtx: AudioContext | null = null
-const playChime = () => {
-  try {
-    if (!audioCtx) audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)()
-    const osc = audioCtx.createOscillator()
-    const gain = audioCtx.createGain()
-    osc.connect(gain)
-    gain.connect(audioCtx.destination)
-    osc.type = 'sine'
-    osc.frequency.setValueAtTime(528, audioCtx.currentTime)
-    osc.frequency.exponentialRampToValueAtTime(792, audioCtx.currentTime + 0.35)
-    gain.gain.setValueAtTime(0.12, audioCtx.currentTime)
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.2)
-    osc.start(audioCtx.currentTime)
-    osc.stop(audioCtx.currentTime + 1.2)
-  } catch (_) {}
-}
-
-let chimeReady = false
-const onAnyClick = () => {
-  if (!chimeReady) {
-    chimeReady = true
-    // First tap unlocks audio context
-    try {
-      audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)()
-    } catch (_) {}
-  }
-}
-
 onMounted(() => {
-  const els = [line1.value, line2.value, line3.value]
+  const lineRefs = [line1.value, line2.value, line3.value]
   const tl = gsap.timeline({ onComplete: () => { animDone.value = true } })
 
-  els.forEach((el, i) => {
+  lineRefs.forEach((el, i) => {
     if (!el) return
     const p = el.querySelector('p')
     if (!p) return
@@ -125,10 +99,11 @@ onMounted(() => {
       duration: 1.4,
       ease: 'expo.out',
       delay: i === 0 ? 0.8 : 0,
-    }, i === 0 ? '+=0' : `+=0.6`)
+    }, i === 0 ? '+=0' : '+=0.6')
   })
 
   tl.to(followUp.value, { opacity: 1, duration: 1.8, ease: 'sine.inOut' }, '+=1.5')
-  tl.call(() => { if (chimeReady) playChime() }, [], '+=0.5')
+  // Bibi's name: imperceptibly slow. She should almost wonder if she imagined it.
+  tl.to(bibiEl.value, { opacity: 0.65, duration: 4.5, ease: 'power1.inOut' }, '+=4')
 })
 </script>
