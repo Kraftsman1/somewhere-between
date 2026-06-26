@@ -20,6 +20,7 @@
     <!-- Months Journey -->
     <MonthSection v-for="month in months" :key="month.name" v-bind="month"
       :month="month.name" :id="`month-${month.name.toLowerCase()}`"
+      :theme="month.theme"
       :class="{ 'text-accent-warm': month.name === 'October' }"
       @enter="handleMonthEnter(month.name)" @leave="handleMonthLeave(month.name)" />
 
@@ -64,6 +65,8 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 gsap.registerPlugin(ScrollTrigger)
 
+const { getMonthByNumber } = useMonthData()
+
 const isStill = ref(false)
 const isGlowing = ref(false)
 const warmthLevel = ref(0)
@@ -81,21 +84,22 @@ type Month = {
   interactionType?: 'resistance' | 'focus' | 'exhale' | 'pacing' | 'static'
   extraText?: string
   extraDelay?: number
+  theme?: string
 }
 
 const months = ref<Month[]>([
-  { name: 'January', message: 'The year began with a quiet promise.', interactionType: 'resistance' },
-  { name: 'February', message: 'Short days, long thoughts, and the comfort of returning.', extraText: 'Today felt like a good day to say this.', extraDelay: 7000 },
-  { name: 'March', message: 'Slowly, light started to reclaim the afternoons.', interactionType: 'exhale' },
-  { name: 'April', message: 'Some victories don\'t announce themselves.', interactionType: 'focus' },
-  { name: 'May', message: 'Some loves leave a shape that stays.', interactionType: 'focus' },
-  { name: 'June', message: 'The warmth arrived,\nsettling into the corners\nof the day.', interactionType: 'pacing' },
-  { name: 'July', message: 'Stillness in the heat. A pause in the middle of everything.', interactionType: 'static' },
-  { name: 'August', message: 'Golden hours that felt like they would last forever.' },
-  { name: 'September', message: 'A shift in the air. The beauty of letting go.', extraText: 'Some things stay.', extraDelay: 2000 },
-  { name: 'October', message: 'Some people make the year feel gentler just by existing.', extraText: 'October feels warmer for a reason.', extraDelay: 3000 },
-  { name: 'November', message: 'The world drew close again. Coziness as a necessity.' },
-  { name: 'December', message: 'Looking back, I realized how much peace you brought.', extraText: "Some days don\u2019t need much noise to feel meaningful.", extraDelay: 4000 },
+  { name: 'January', message: 'The year began with a quiet promise.', interactionType: 'resistance', theme: getMonthByNumber(1)?.theme },
+  { name: 'February', message: 'Short days, long thoughts, and the comfort of returning.', extraText: 'Today felt like a good day to say this.', extraDelay: 7000, theme: getMonthByNumber(2)?.theme },
+  { name: 'March', message: 'Slowly, light started to reclaim the afternoons.', interactionType: 'exhale', theme: getMonthByNumber(3)?.theme },
+  { name: 'April', message: 'Some victories don\'t announce themselves.', interactionType: 'focus', theme: getMonthByNumber(4)?.theme },
+  { name: 'May', message: 'Some loves leave a shape that stays.', interactionType: 'focus', theme: getMonthByNumber(5)?.theme },
+  { name: 'June', message: 'The warmth arrived,\nsettling into the corners\nof the day.', interactionType: 'pacing', theme: getMonthByNumber(6)?.theme },
+  { name: 'July', message: 'Stillness in the heat. A pause in the middle of everything.', interactionType: 'static', theme: getMonthByNumber(7)?.theme },
+  { name: 'August', message: 'Golden hours that felt like they would last forever.', theme: getMonthByNumber(8)?.theme },
+  { name: 'September', message: 'A shift in the air. The beauty of letting go.', extraText: 'Some things stay.', extraDelay: 2000, theme: getMonthByNumber(9)?.theme },
+  { name: 'October', message: 'Some people make the year feel gentler just by existing.', extraText: 'October feels warmer for a reason.', extraDelay: 3000, theme: getMonthByNumber(10)?.theme },
+  { name: 'November', message: 'The world drew close again. Coziness as a necessity.', theme: getMonthByNumber(11)?.theme },
+  { name: 'December', message: 'Looking back, I realized how much peace you brought.', extraText: "Some days don\u2019t need much noise to feel meaningful.", extraDelay: 4000, theme: getMonthByNumber(12)?.theme },
 ])
 
 const handleMonthEnter = (name: string) => {
@@ -198,7 +202,7 @@ onUnmounted(() => {
 })
 
 useHead({
-  title: 'A Year in Calm Moments'
+  title: 'Somewhere Between'
 })
 </script>
 

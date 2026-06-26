@@ -8,7 +8,10 @@
       @touchstart.passive="handleInteraction(true)"
       @touchend.passive="handleInteraction(false)">
 
-      <!-- Month label: numeral · rule · name -->
+      <!-- Month label: theme (if set) · numeral · rule · name -->
+      <div v-if="theme" class="mb-2">
+        <p class="font-sans text-[8px] md:text-[9px] tracking-[0.4em] uppercase text-accent/55 font-light">{{ theme }}</p>
+      </div>
       <div v-if="month" class="flex items-center gap-3">
         <span class="font-sans text-[9px] tracking-[0.35em] uppercase text-accent/40 tabular-nums select-none">
           {{ String(monthIndex).padStart(2, '0') }}
@@ -74,6 +77,7 @@ const props = defineProps<{
   interactionType?: 'resistance' | 'focus' | 'exhale' | 'pacing' | 'static'
   extraText?: string
   extraDelay?: number
+  theme?: string
 }>()
 
 const emits = defineEmits(['enter', 'leave'])
