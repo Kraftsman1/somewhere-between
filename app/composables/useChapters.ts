@@ -59,7 +59,7 @@ export const useChapters = () => {
     {
       id: 'healing',
       title: 'Healing',
-      date: new Date('2026-04-01'),
+      date: new Date('2026-04-14'),
       displayDate: 'April 2026',
       type: 'immersive',
       state: 'preserved',
@@ -69,8 +69,8 @@ export const useChapters = () => {
     {
       id: 'remembering',
       title: 'Remembering',
-      date: new Date('2026-05-01'),
-      displayDate: 'May 2026',
+      date: new Date('2026-05-02'),
+      displayDate: 'May 2, 2026',
       type: 'immersive',
       state: 'preserved',
       slug: 'remembering',
