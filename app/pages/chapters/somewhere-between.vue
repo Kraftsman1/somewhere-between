@@ -17,7 +17,7 @@
 
         <!-- Chapter label -->
         <div class="fixed top-6 right-6 z-40">
-            <span class="font-sans text-[8px] tracking-[0.35em] uppercase text-accent/30 font-light">Prologue</span>
+            <span class="font-sans text-[8px] tracking-[0.35em] uppercase text-accent/30 font-light">Chapter III</span>
         </div>
 
         <!-- Content -->

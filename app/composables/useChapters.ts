@@ -21,7 +21,7 @@ export const useChapters = () => {
       title: 'Somewhere Between',
       date: new Date('2025-02-01'),
       displayDate: 'February 2025',
-      type: 'prologue',
+      type: 'immersive',
       state: 'remembered',
       slug: 'somewhere-between',
       reflection: 'A year of quiet moments, small joys, and the comfort of returning. Not every chapter needs a turning point to matter.',
@@ -81,13 +81,7 @@ export const useChapters = () => {
   const getVisibleChapters = (): Chapter[] => {
     const today = new Date()
     today.setUTCHours(0, 0, 0, 0)
-    return chapters
-      .filter(c => c.date <= today)
-      .sort((a, b) => {
-        if (a.type === 'prologue') return -1
-        if (b.type === 'prologue') return 1
-        return a.date.getTime() - b.date.getTime()
-      })
+    return chapters.filter(c => c.date <= today).sort((a, b) => a.date.getTime() - b.date.getTime())
   }
 
   return { chapters, getVisibleChapters }

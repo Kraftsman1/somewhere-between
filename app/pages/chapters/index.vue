@@ -39,7 +39,7 @@
             <div class="flex items-start justify-between gap-4">
               <div class="space-y-1.5">
                 <p class="font-sans text-[8px] tracking-[0.4em] uppercase text-accent/40 font-light">
-                  {{ chapter.type === 'prologue' ? 'Prologue' : `Chapter ${chapterNumerals.get(chapter.id)}` }}
+                  Chapter {{ chapterNumerals.get(chapter.id) }}
                 </p>
                 <h2 class="font-serif text-[1.3rem] md:text-2xl text-text leading-snug">{{ chapter.title }}</h2>
                 <p class="font-sans text-[8px] tracking-[0.3em] uppercase text-accent/35 font-light">{{ chapter.displayDate }}</p>
@@ -72,7 +72,7 @@
                   Some memories are complete exactly as they are.
                 </p>
 
-                <div v-if="chapter.type === 'prologue' || chapter.type === 'immersive'" class="pt-2">
+                <div v-if="chapter.type === 'immersive'" class="pt-2">
                   <div class="h-px w-8 bg-accent/20 mb-4" />
                   <NuxtLink
                     :to="`/chapters/${chapter.slug}`"
@@ -117,10 +117,7 @@ const allVisible = computed(() => getVisibleChapters())
 
 const chapterNumerals = computed(() => {
   const map = new Map<string, string>()
-  let idx = 0
-  for (const c of allVisible.value) {
-    if (c.type !== 'prologue') map.set(c.id, romanNumerals[idx++])
-  }
+  allVisible.value.forEach((c, idx) => map.set(c.id, romanNumerals[idx]))
   return map
 })
 
