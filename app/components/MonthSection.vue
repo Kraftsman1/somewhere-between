@@ -53,12 +53,14 @@
 
       <slot name="extra" />
 
-      <!-- Very subtle dedicated route link -->
-      <div v-if="month" class="mt-8 transition-opacity duration-1000 opacity-0 group-hover:opacity-100">
-        <NuxtLink :to="`/${month.toLowerCase()}`"
-          class="inline-block px-4 py-2 text-[8px] md:text-[9px] font-sans uppercase tracking-[0.4em] text-accent/20 hover:text-accent/60 transition-colors duration-500 font-light"
-          style="text-decoration: none;">
-          open —
+      <!-- Chapter link — fades in after reveal when the month has a dedicated chapter -->
+      <div ref="chapterLinkEl" v-if="chapterRoute" class="opacity-0 mt-2">
+        <NuxtLink
+          :to="chapterRoute"
+          class="font-sans text-[8px] tracking-[0.4em] uppercase text-accent/40 hover:text-accent/70 active:text-accent/70 transition-colors duration-500 font-light"
+          style="text-decoration: none;"
+        >
+          Continue →
         </NuxtLink>
       </div>
     </div>
@@ -78,6 +80,7 @@ const props = defineProps<{
   extraText?: string
   extraDelay?: number
   theme?: string
+  chapterRoute?: string
 }>()
 
 const emits = defineEmits(['enter', 'leave'])
@@ -85,16 +88,17 @@ const emits = defineEmits(['enter', 'leave'])
 const container = ref<HTMLElement | null>(null)
 const messageEl = ref<HTMLElement | null>(null)
 const extraEl = ref<HTMLElement | null>(null)
+const chapterLinkEl = ref<HTMLElement | null>(null)
 
 const timeline = ref<gsap.core.Timeline | null>(null)
 let extraTimer: ReturnType<typeof setTimeout> | null = null
+let chapterLinkTimer: ReturnType<typeof setTimeout> | null = null
 const extraRevealed = ref(false)
+const chapterLinkRevealed = ref(false)
 
 const cancelExtra = () => {
-  if (extraTimer !== null) {
-    clearTimeout(extraTimer)
-    extraTimer = null
-  }
+  if (extraTimer !== null) { clearTimeout(extraTimer); extraTimer = null }
+  if (chapterLinkTimer !== null) { clearTimeout(chapterLinkTimer); chapterLinkTimer = null }
 }
 
 const isLineByLine = computed(() => props.interactionType === 'pacing')
@@ -124,6 +128,15 @@ const handleEnter = () => {
       extraRevealed.value = true
       gsap.to(target, { opacity: 1, duration: 1.5, ease: 'sine.inOut' })
     }, delay)
+  }
+
+  // Chapter link — fades in 2.5s after enter, stays once revealed
+  if (props.chapterRoute && chapterLinkEl.value && !chapterLinkRevealed.value) {
+    const target = chapterLinkEl.value
+    chapterLinkTimer = setTimeout(() => {
+      chapterLinkRevealed.value = true
+      gsap.to(target, { opacity: 1, duration: 1.5, ease: 'sine.inOut' })
+    }, 2500)
   }
 
   // August haptic pulse

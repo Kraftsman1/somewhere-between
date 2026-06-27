@@ -22,16 +22,6 @@ const sectionRef = ref<HTMLElement | null>(null)
 const contentRef = ref<HTMLElement | null>(null)
 let observer: IntersectionObserver | null = null
 let isEntered = false
-let scrollLockTimer: ReturnType<typeof setTimeout> | null = null
-
-const lockScroll = () => {
-  document.documentElement.style.overflowY = 'hidden'
-  if (scrollLockTimer) clearTimeout(scrollLockTimer)
-  // 1.1s transition + 400ms buffer — then hand control back
-  scrollLockTimer = setTimeout(() => {
-    document.documentElement.style.overflowY = ''
-  }, 1500)
-}
 
 onMounted(() => {
   const el = sectionRef.value
@@ -47,7 +37,6 @@ onMounted(() => {
       emits('enter')
       content.classList.remove('reveal-out-up', 'reveal-out-down')
       content.classList.add('reveal-in')
-      lockScroll()
     } else if (entry.intersectionRatio <= 0.05 && isEntered) {
       // Section is almost fully gone — fire leave once
       isEntered = false
@@ -63,11 +52,7 @@ onMounted(() => {
   observer.observe(el)
 })
 
-onUnmounted(() => {
-  observer?.disconnect()
-  if (scrollLockTimer) clearTimeout(scrollLockTimer)
-  document.documentElement.style.overflowY = ''
-})
+onUnmounted(() => observer?.disconnect())
 </script>
 
 <style scoped>
