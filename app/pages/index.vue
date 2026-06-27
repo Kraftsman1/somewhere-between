@@ -137,13 +137,13 @@ type Month = {
 }
 
 const months = ref<Month[]>([
-  { name: 'January', message: 'The year began with a quiet promise.', interactionType: 'resistance', theme: getMonthByNumber(1)?.theme },
-  { name: 'February', message: 'Short days, long thoughts, and the comfort of returning.', extraText: 'Today felt like a good day to say this.', extraDelay: 7000, theme: getMonthByNumber(2)?.theme },
-  { name: 'March', message: 'Slowly, light started to reclaim the afternoons.', interactionType: 'exhale', theme: getMonthByNumber(3)?.theme },
+  { name: 'January', message: 'The year began with a quiet promise.', interactionType: 'resistance', theme: getMonthByNumber(1)?.theme, chapterRoute: getMonthByNumber(1)?.route },
+  { name: 'February', message: 'Short days, long thoughts, and the comfort of returning.', extraText: 'Today felt like a good day to say this.', extraDelay: 7000, theme: getMonthByNumber(2)?.theme, chapterRoute: getMonthByNumber(2)?.route },
+  { name: 'March', message: 'Slowly, light started to reclaim the afternoons.', interactionType: 'exhale', theme: getMonthByNumber(3)?.theme, chapterRoute: getMonthByNumber(3)?.route },
   { name: 'April', message: 'Some victories don\'t announce themselves.', interactionType: 'focus', theme: getMonthByNumber(4)?.theme, chapterRoute: getMonthByNumber(4)?.route },
   { name: 'May', message: 'Some loves leave a shape that stays.', interactionType: 'focus', theme: getMonthByNumber(5)?.theme, chapterRoute: getMonthByNumber(5)?.route },
-  { name: 'June', message: 'The warmth arrived,\nsettling into the corners\nof the day.', interactionType: 'pacing', theme: getMonthByNumber(6)?.theme },
-  { name: 'July', message: 'Stillness in the heat. A pause in the middle of everything.', interactionType: 'static', theme: getMonthByNumber(7)?.theme },
+  { name: 'June', message: 'The warmth arrived,\nsettling into the corners\nof the day.', interactionType: 'pacing', theme: getMonthByNumber(6)?.theme, chapterRoute: getMonthByNumber(6)?.route },
+  { name: 'July', message: 'Stillness in the heat. A pause in the middle of everything.', interactionType: 'static', theme: getMonthByNumber(7)?.theme, chapterRoute: getMonthByNumber(7)?.route },
 ])
 
 const introWords = ['moments', 'conversations', 'seasons', 'memories', 'beginnings', 'home']
