@@ -8,6 +8,11 @@
       :class="scrollResistance ? 'reveal-slow' : ''">
       <slot />
     </div>
+
+    <!-- Bottom hint — sits outside the reveal animation -->
+    <div v-if="$slots.bottom" class="absolute bottom-6 inset-x-0 flex justify-center pointer-events-none">
+      <slot name="bottom" />
+    </div>
   </section>
 </template>
 

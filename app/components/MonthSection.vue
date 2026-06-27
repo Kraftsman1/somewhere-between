@@ -64,6 +64,11 @@
         </NuxtLink>
       </div>
     </div>
+    <template v-if="nextLabel" #bottom>
+      <p class="font-sans text-[7px] tracking-[0.4em] uppercase text-accent/25 font-light">
+        {{ nextLabel }} ↓
+      </p>
+    </template>
   </SectionWrapper>
 </template>
 
@@ -81,6 +86,7 @@ const props = defineProps<{
   extraDelay?: number
   theme?: string
   chapterRoute?: string
+  nextLabel?: string
 }>()
 
 const emits = defineEmits(['enter', 'leave'])
