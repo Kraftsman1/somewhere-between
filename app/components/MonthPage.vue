@@ -14,10 +14,11 @@
     <div class="fixed inset-0 z-[2] pointer-events-none opacity-50"
       style="background-image: url('data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\' opacity=\'0.035\'/%3E%3C/svg%3E'); background-size: 256px 256px;" />
 
-    <!-- Back link -->
+    <!-- Back link — revealed only after last slide -->
     <NuxtLink
       :to="backRoute ?? '/'"
-      class="fixed top-6 left-6 z-40 flex items-center gap-2 group"
+      class="fixed top-6 left-6 z-40 flex items-center gap-2 group transition-opacity duration-700"
+      :class="isLastSlide ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'"
       style="text-decoration: none;"
     >
       <span class="font-sans text-[8px] tracking-[0.4em] uppercase text-accent/30 group-hover:text-accent/65 transition-colors duration-500 font-light">← Back</span>
