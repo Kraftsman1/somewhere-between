@@ -9,7 +9,6 @@
         @mouseenter="onHoverEnter"
         @mouseleave="onHoverLeave"
         @click="onTrigger"
-        @touchstart.passive="onTrigger"
       >
         <div class="flex flex-col items-center gap-1 group p-3">
           <span
@@ -66,7 +65,7 @@
           ref="backdropRef"
           class="absolute inset-0 opacity-0"
           style="background: rgba(32, 30, 26, 0.5); backdrop-filter: blur(14px);"
-          @click="close"
+          @click="canClose && close()"
         />
         <!-- Card -->
         <div
@@ -127,6 +126,7 @@ const icon = computed(() => props.icon ?? '✦')
 const isVisible = ref(false)
 const revealed = ref(false)
 const holdProgress = ref(0)
+const canClose = ref(false)
 
 const backdropRef = ref<HTMLElement | null>(null)
 const cardRef = ref<HTMLElement | null>(null)
@@ -159,6 +159,8 @@ const onTrigger = () => {
 const openNote = () => {
   isVisible.value = true
   revealed.value = true
+  canClose.value = false
+  setTimeout(() => { canClose.value = true }, 500)
   if ('vibrate' in navigator) navigator.vibrate(20)
 
   nextTick(() => {
