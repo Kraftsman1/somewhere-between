@@ -101,9 +101,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-
-gsap.registerPlugin(ScrollTrigger)
 
 const { getMonthByNumber } = useMonthData()
 
@@ -291,11 +288,6 @@ onMounted(() => {
   window.addEventListener('touchstart', resetActivity, { passive: true })
   ticker = setInterval(checkStillness, 1000)
 
-  ScrollTrigger.create({
-    trigger: '#month-september',
-    start: 'top center',
-    onUpdate: (_self) => {}
-  })
 })
 
 onUnmounted(() => {
