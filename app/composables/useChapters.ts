@@ -19,8 +19,8 @@ export const useChapters = () => {
     {
       id: 'somewhere-between',
       title: 'Somewhere Between',
-      date: new Date('2025-02-01'),
-      displayDate: 'February 2025',
+      date: new Date('2026-02-14'),
+      displayDate: 'February 14, 2026',
       type: 'immersive',
       state: 'remembered',
       slug: 'somewhere-between',
