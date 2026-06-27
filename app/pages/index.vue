@@ -25,6 +25,13 @@
           </p>
         </div>
 
+        <!-- Savour message -->
+        <div ref="savourRef" style="opacity: 0;">
+          <p class="font-serif text-sm md:text-base italic text-text/45 leading-relaxed">
+            Linger on each one. There are quiet notes tucked along the way — they reveal themselves to those who stay a little longer.
+          </p>
+        </div>
+
         <!-- Continue CTA -->
         <div ref="ctaRef" style="opacity: 0;">
           <button
@@ -119,6 +126,7 @@ const activeMonth = ref<string | null>(null)
 const overlayRef = ref<HTMLElement | null>(null)
 const titleRef = ref<HTMLElement | null>(null)
 const paraRef = ref<HTMLElement | null>(null)
+const savourRef = ref<HTMLElement | null>(null)
 const ctaRef = ref<HTMLElement | null>(null)
 const timestampRef = ref<HTMLElement | null>(null)
 const scrollHintRef = ref<HTMLElement | null>(null)
@@ -280,8 +288,11 @@ onMounted(() => {
   if (paraRef.value) {
     gsap.to(paraRef.value, { opacity: 1, duration: 1.8, delay: 3, ease: 'sine.inOut' })
   }
+  if (savourRef.value) {
+    gsap.to(savourRef.value, { opacity: 1, duration: 1.5, delay: 5, ease: 'sine.inOut' })
+  }
   if (ctaRef.value) {
-    gsap.to(ctaRef.value, { opacity: 1, duration: 1.5, delay: 5.5, ease: 'sine.inOut' })
+    gsap.to(ctaRef.value, { opacity: 1, duration: 1.5, delay: 6.5, ease: 'sine.inOut' })
   }
 
   window.addEventListener('scroll', resetActivity, { passive: true })
