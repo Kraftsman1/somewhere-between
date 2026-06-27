@@ -9,7 +9,7 @@
   >
     <template #easter-egg>
       <EasterEgg
-        trigger="hover"
+        trigger="click"
         icon="✦"
         label="Notice this"
         content="You make ordinary days feel considered."

@@ -9,7 +9,7 @@
   >
     <template #easter-egg>
       <EasterEgg
-        trigger="hover"
+        trigger="click"
         icon="◌"
         label="Feel the shift"
         content="Some people just make things calmer by being near."
